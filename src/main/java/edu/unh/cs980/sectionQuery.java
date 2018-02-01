@@ -29,6 +29,7 @@ import java.io.FileWriter;
 
 public class sectionQuery {
 	
+	//Author: Laura and Peihao
 	public static void main(String[] args) throws IOException {
 		
         System.setProperty("file.encoding", "UTF-8");
@@ -37,7 +38,7 @@ public class sectionQuery {
         String indexPath = args[1];
         String outputPath = args[2];
         
-        File runfile = new File(outputPath);
+        File runfile = new File(outputPath + "/runfile_section_0");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
         
@@ -47,8 +48,13 @@ public class sectionQuery {
         final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
         final FileInputStream fileInputStream3 = new FileInputStream(new File(pagesFile));
         
+        System.out.println("starting searching for sections ...");
+        
+        int count = 0;
+        
         for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
             for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
+            	
                 final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
                 String queryStr = buildSectionQueryStr(page, sectionPath);
                 TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
@@ -62,11 +68,19 @@ public class sectionQuery {
                     final int searchRank = i+1;
 
                     //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
-                    writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
+                    System.out.println(".");
+                    writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25\n");
+                    count ++;
+           
                 }
 
             }
         }
+        
+        writer.flush();
+		writer.close();
+        
+        System.out.println("Write " + count + " results\nQuery Done!");
         
 	}
 	

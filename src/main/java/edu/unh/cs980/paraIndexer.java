@@ -20,6 +20,7 @@ import java.util.Iterator;
 
 public class paraIndexer {
 	
+	//Author: Laura and Peihao
 	public static void main(String[] args) throws IOException {
 		
         System.setProperty("file.encoding", "UTF-8");
@@ -52,7 +53,7 @@ public class paraIndexer {
         indexWriter.close();
     }
 	
-	//Author: Laura dietz
+	//Author: Laura 
 	private static IndexWriter setupIndexWriter(String indexPath, String typeIndex) throws IOException {
         Path path = FileSystems.getDefault().getPath(indexPath, typeIndex);
         Directory indexDir = FSDirectory.open(path);
@@ -60,7 +61,7 @@ public class paraIndexer {
         return new IndexWriter(indexDir, config);
     }
 	
-	//Author: Laura dietz
+	//Author: Laura 
 	private static Document paragraphToLuceneDoc(Data.Paragraph p) {
         final Document doc = new Document();
         final String content = p.getTextOnly(); // <-- Todo Adapt this to your needs!
