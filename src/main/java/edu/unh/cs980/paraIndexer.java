@@ -39,6 +39,7 @@ public class paraIndexer {
         for (int i=1; paragraphIterator.hasNext(); i++){
         	
             Document doc = paragraphToLuceneDoc(paragraphIterator.next());
+         
             indexWriter.addDocument(doc);
             if (i % 10000 == 0) {
                 System.out.println("Index done for " + i + "k paragraphs");

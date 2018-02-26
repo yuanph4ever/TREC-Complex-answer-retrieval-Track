@@ -1,6 +1,7 @@
 package edu.unh.cs980;
 
 import edu.unh.cs.treccar_v2.Data;
+
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
@@ -29,8 +30,15 @@ import java.io.FileWriter;
 
 public class pageQuery {
 	
-	//Author: Laura and Peihao
+	private static void usage() {
+        System.out.println("Command line parameters: Outline_CBOR Lucene_INDEX Output_Dir *Clusters_info");
+        System.exit(-1);
+    }
+	
 	public static void main(String[] args) throws IOException {
+		
+		if (args.length < 3)
+			usage();
 		
         System.setProperty("file.encoding", "UTF-8");
         
@@ -38,24 +46,36 @@ public class pageQuery {
         String indexPath = args[1];
         String outputPath = args[2];
         
-        File runfile = new File(outputPath + "/runfile_page_0");
+        
+        if (args.length == 4) {
+        		String clusters = args[3];
+        		File rf = new File(outputPath + "/runfile_page_with_clusters");
+        		rf.createNewFile();
+        		FileWriter wtr = new FileWriter(rf); 	
+        }
+        	    
+            
+        
+        File runfile = new File(outputPath + "/runfile_page");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
+		
         
-        //paragraphs-run-sections
-		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene");
+        //paragraphs-run-pages
+		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
         searcher.setSimilarity(new BM25Similarity());
         final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
-        final FileInputStream fileInputStream3 = new FileInputStream(new File(pagesFile));
+        final FileInputStream fileInputStream = new FileInputStream(new File(pagesFile));
         
         System.out.println("starting searching for pages ...");
         
         int count = 0;
         
-        for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
+        for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
+        	
             final String queryId = page.getPageId();
 
-            String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
+            String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList(), 2);
 
             TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
             ScoreDoc[] scoreDoc = tops.scoreDocs;
@@ -120,15 +140,44 @@ public class pageQuery {
         return new IndexSearcher(reader);
     }
 	
-	//Author: Laura dietz
-	private static String buildSectionQueryStr(Data.Page page, List<Data.Section> sectionPath) {
-        StringBuilder queryStr = new StringBuilder();
-        queryStr.append(page.getPageName());
-        for (Data.Section section: sectionPath) {
-            queryStr.append(" ").append(section.getHeading());
-        }
-        //System.out.println("queryStr = " + queryStr);
-        return queryStr.toString();
+	private static String buildSectionQueryStr(Data.Page page, List<Data.Section> sectionPath, int flag) {
+		//For page name plus all sections' headings
+		if(flag == 0) {
+			StringBuilder queryStr = new StringBuilder();
+	        queryStr.append(page.getPageName());
+	        System.out.println("queryStr = " + queryStr);
+	        for (List<Data.Section> sectionPath1 : page.flatSectionPaths()) {
+        	        for (Data.Section section: sectionPath1) {
+                    //System.out.println(section.getHeading());
+        	        	    queryStr.append(" ").append(section.getHeading());
+                }
+            }
+	        System.out.println("queryStr = " + queryStr);
+	        return queryStr.toString();
+		}
+		//For just page name 
+		else if(flag == 1) {
+			StringBuilder queryStr = new StringBuilder();
+	        queryStr.append(page.getPageName());
+	        for (Data.Section section: sectionPath) {
+	            queryStr.append(" ").append(section.getHeading());
+	        }
+	        //System.out.println("queryStr = " + queryStr);
+	        return queryStr.toString();
+		}
+		//For just the lowest section heading
+		else {
+			//StringBuilder queryStr = new StringBuilder();
+			String queryStr = " ";
+			for (List<Data.Section> sectionPath1 : page.flatSectionPaths()) {
+    	            for (Data.Section section: sectionPath1) {
+                    //System.out.println(section.getHeading());
+    	        	        queryStr = section.getHeading();
+                }
+            }
+			System.out.println(queryStr);
+	        return queryStr;
+		}
     }
 	
 }
