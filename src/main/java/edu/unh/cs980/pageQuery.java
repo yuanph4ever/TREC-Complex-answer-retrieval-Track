@@ -2,6 +2,7 @@ package edu.unh.cs980;
 
 import edu.unh.cs.treccar_v2.Data;
 
+
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
@@ -15,6 +16,11 @@ import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +32,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import java.io.FileWriter;
+
+import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class pageQuery {
 	
@@ -46,20 +63,117 @@ public class pageQuery {
         String indexPath = args[1];
         String outputPath = args[2];
         
-        
         if (args.length == 4) {
         		String clusters = args[3];
         		File rf = new File(outputPath + "/runfile_page_with_clusters");
         		rf.createNewFile();
         		FileWriter wtr = new FileWriter(rf); 	
-        }
-        	    
+        		String[] dim = new String[56341];
+        		ArrayList<double[]> al = new ArrayList<double[]>();
+        		
+        		try {
+        			
+        			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+        			org.w3c.dom.Document doc = docBuilder.parse (new File(clusters));
+        			
+        			// normalize text representation
+        			doc.getDocumentElement().normalize ();
+        			System.out.println ("Root element of the doc is " + doc.getDocumentElement().getNodeName());
+        			
+        			NodeList listOfDimensions = doc.getElementsByTagName("dimension");
+        			int total_dimensions = listOfDimensions.getLength();
+        			System.out.println("Total no of dimensions : " + total_dimensions);
+        			
+        			Node dimNode = listOfDimensions.item(0);
+        			
+        			Element dimElement = (Element)dimNode; 
+
+        			//-------
+        			NodeList dimList = dimElement.getElementsByTagName("description");
+        			Element dim_e = (Element)dimList.item(0);
+
+        			NodeList textFNList_d = dim_e.getChildNodes();
+        			//System.out.println("Dimensions : " + ((Node)textFNList_d.item(0)).getNodeValue().trim());
+        			
+        			String dim_str = ((Node)textFNList_d.item(0)).getNodeValue().trim();
+        			
+        			dim = dim_str.split(" ");
+        			
+        			/*
+        			int count = 0;
+                    for (String temp: dim){
+                    	    count += 1;
+                    	    if (count == 10)
+                    	    		break;
+                        System.out.println(temp);
+                     }
+        	        */
+        			
+        			
+        			NodeList listOfCentroids = doc.getElementsByTagName("centroid");
+        			int total_centroids = listOfCentroids.getLength();
+        			System.out.println("Total no of centroids : " + total_centroids);
+        			
+        			for(int s=0; s<listOfCentroids.getLength() ; s++){
+
+
+        				Node CentroidNode = listOfCentroids.item(s);
+        				if(CentroidNode.getNodeType() == Node.ELEMENT_NODE){
+
+
+        					Element CentroidElement = (Element)CentroidNode; 
+
+        					//-------
+        					NodeList CentroidList = CentroidElement.getElementsByTagName("description");
+        					Element Centroid = (Element)CentroidList.item(0);
+
+        					NodeList textFNList = Centroid.getChildNodes();
+        					System.out.println("Centroid : " + ((Node)textFNList.item(0)).getNodeValue().trim());
+        					
+        					String vec_str = ((Node)textFNList.item(0)).getNodeValue().trim();
+        					
+        					String[] vec_s = new String[56341];
+        					double[] vec_d = new double[vec_s.length];
+        					for (int i = 0; i<vec_s.length; i++) 
+        						vec_d[i] = Double.valueOf(vec_s[i]);
+        					
+        					al.add(vec_d);
+
+
+        				}//end of if clause
+
+
+        			}//end of for loop with s var
+        			
+        			
+        			
+        		}catch (SAXParseException err) {
+        			System.out.println ("** Parsing error" + ", line " + err.getLineNumber () + ", uri " + err.getSystemId ());
+        			System.out.println(" " + err.getMessage ());
+
+        			}catch (SAXException e) {
+        			Exception x = e.getException ();
+        			((x == null) ? e : x).printStackTrace ();
+
+        			}catch (Throwable t) {
+        			t.printStackTrace ();
+        			}
+
             
+        		for(int i = 0; i < al.size(); i ++) {
+        			double[] cen_vec = al.get(i);
+        			for(int j = 0; j < cen_vec.length; j++) {
+        				System.out.println(cen_vec[j] + "\n");
+        			}
+        		}
+             
+        }
         
-        File runfile = new File(outputPath + "/runfile_page");
+        
+        File runfile = new File(outputPath + "/runfile_page_vectors");
 		runfile.createNewFile();
-		FileWriter writer = new FileWriter(runfile);
-		
+		FileWriter writer = new FileWriter(runfile);		
         
         //paragraphs-run-pages
 		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
@@ -75,7 +189,7 @@ public class pageQuery {
         	
             final String queryId = page.getPageId();
 
-            String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList(), 2);
+            String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList(), 1);
 
             TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
             ScoreDoc[] scoreDoc = tops.scoreDocs;
@@ -86,19 +200,25 @@ public class pageQuery {
                 final String paragraphid = doc.getField("paragraphid").stringValue();
                 final float searchScore = score.score;
                 final int searchRank = i+1;
+                
+                //---
+                final String para_text = doc.getField("text").stringValue();
 
                 //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
                 System.out.println(".");
-                writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25\n");
+                writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25" + " // " + queryStr + 
+                		" // " + para_text + "\n");
                 count ++;
             }
+            
+            writer.write("---\n");
 
         }
         
         writer.flush();//why flush?
 		writer.close();
         
-        System.out.println("Write " + count + " results\nQuery Done!");
+        System.out.println("Write " + count + " results\nQuery Done!");      
         
 	}
 	
@@ -179,5 +299,98 @@ public class pageQuery {
 	        return queryStr;
 		}
     }
+	
+	/*
+	private static String[] xmlReader_dim(String filename) {
+		
+		try {
+			
+			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+			org.w3c.dom.Document doc = docBuilder.parse (new File(filename));
+			
+			// normalize text representation
+			doc.getDocumentElement().normalize ();
+			System.out.println ("Root element of the doc is " + doc.getDocumentElement().getNodeName());
+			
+			NodeList listOfDimensions = doc.getElementsByTagName("dimension");
+			int total_dimensions = listOfDimensions.getLength();
+			System.out.println("Total no of dimensions : " + total_dimensions);
+			
+			Node dimNode = listOfDimensions.item(0);
+			
+			Element dimElement = (Element)dimNode; 
+
+			//-------
+			NodeList dimList = dimElement.getElementsByTagName("description");
+			Element dim_e = (Element)dimList.item(0);
+
+			NodeList textFNList_d = dim_e.getChildNodes();
+			//System.out.println("Dimensions : " + ((Node)textFNList_d.item(0)).getNodeValue().trim());
+			
+			String dim_str = ((Node)textFNList_d.item(0)).getNodeValue().trim();
+			
+			String[] dim = new String[56341];
+			
+			dim = dim_str.split(" ");
+			
+			return dim;
+			
+			
+			int count = 0;
+            for (String temp: dim){
+            	    count += 1;
+            	    if (count == 10)
+            	    		break;
+                System.out.println(temp);
+             }
+             
+			
+			
+	        
+			
+			NodeList listOfCentroids = doc.getElementsByTagName("centroid");
+			int total_centroids = listOfCentroids.getLength();
+			System.out.println("Total no of centroids : " + total_centroids);
+			
+			for(int s=0; s<listOfCentroids.getLength() ; s++){
+
+
+				Node CentroidNode = listOfCentroids.item(s);
+				if(CentroidNode.getNodeType() == Node.ELEMENT_NODE){
+
+
+					Element CentroidElement = (Element)CentroidNode; 
+
+					//-------
+					NodeList CentroidList = CentroidElement.getElementsByTagName("description");
+					Element Centroid = (Element)CentroidList.item(0);
+
+					NodeList textFNList = Centroid.getChildNodes();
+					System.out.println("Centroid : " + ((Node)textFNList.item(0)).getNodeValue().trim());
+
+
+				}//end of if clause
+
+
+			}//end of for loop with s var
+			
+			
+			
+		}catch (SAXParseException err) {
+			System.out.println ("** Parsing error" + ", line " + err.getLineNumber () + ", uri " + err.getSystemId ());
+			System.out.println(" " + err.getMessage ());
+
+			}catch (SAXException e) {
+			Exception x = e.getException ();
+			((x == null) ? e : x).printStackTrace ();
+
+			}catch (Throwable t) {
+			t.printStackTrace ();
+			}
+
+	}
+	*/
+	
 	
 }
