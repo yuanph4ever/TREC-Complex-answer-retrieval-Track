@@ -52,10 +52,10 @@ public class HeadingWeights {
 	
 	public HeadingWeights(String pagesFile, String indexPath, String outputPath) throws IOException
 	{
-		HeadingWeights(outputPath, indexPath, pagesFile);
+		computeHeadingWeights(outputPath, indexPath, pagesFile);
 	}
 
-	private static void HeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
+	private static void computeHeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
 		// TODO Auto-generated method stub
 		PageSearch(outputPath, indexPath, pagesFile);
 		SectionSearch(outputPath, indexPath, pagesFile);

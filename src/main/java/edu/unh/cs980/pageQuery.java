@@ -62,6 +62,9 @@ public class pageQuery {
         String pagesFile = args[0];
         String indexPath = args[1];
         String outputPath = args[2];
+        HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
+        
+       
         
         if (args.length == 4) {
         		String clusters = args[3];
