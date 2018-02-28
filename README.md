@@ -16,7 +16,7 @@ flag is either "-hw" or "-v"
 
    It will give you three runfiles for different heading weight. Use it by the following command line.
      
-     java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar flag Lucene_INDEX Output_Dir *Outline_CBOR
+     java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar flag Lucene_INDEX Output_Dir *Outline_CBOR  
      
 2. For "-v":
 
