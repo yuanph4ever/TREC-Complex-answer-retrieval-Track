@@ -21,7 +21,10 @@ It demands two paths: 1) The path of input file (the output path of step2)
 2)	  Page Ranking: Each keyword and category refers to its DBpedia page. The keyword page gives     
 reference of the category page. The concept is similar to a page giving citation of the other page.
 The score is proportional to the number of reference.
-              Step5: Run Index.java: The grouping module collect all the related entity under it. This program    
+---------The above process till step4 is the indexing process to get the entity keyword and category relationship  to generate a runfile--------------------------------------------------
+              
+	     The runfile name : curlout.txt      
+	      Step5: Run Index.java: The grouping module collect all the related entity under it. This program    
             identifies to which page has got maximum reference and citation and accordingly score them and       
             rank them.
 It demands two paths: 1) The path of input file (the output path of step4)
