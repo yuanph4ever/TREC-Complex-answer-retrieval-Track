@@ -1,4 +1,4 @@
-package prototype1;
+package edu.unh.cs980;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

@@ -29,7 +29,7 @@
 						<configuration>
 							<archive>
 								<manifest>
-									<mainClass>edu.unh.cs980.paraIndexer_v</mainClass>
+									<mainClass>edu.unh.cs980.pageQuery</mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>

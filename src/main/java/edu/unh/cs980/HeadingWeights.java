@@ -141,7 +141,7 @@ public class HeadingWeights {
 					final String paragraphid = doc.getField("paragraphid").stringValue();
 					final float searchScore = score.score;
 					final int searchRank = i + 1;
-					System.out.println(page.getPageName() + " " + queryStr);
+					//System.out.println(page.getPageName() + " " + queryStr);
 					// System.out.println(queryId+" Q0 "+paragraphid+"
 					// "+searchRank + " "+searchScore+" Lucene-BM25");
 					System.out.println(".");
