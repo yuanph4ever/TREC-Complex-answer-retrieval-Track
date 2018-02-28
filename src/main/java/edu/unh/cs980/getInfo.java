@@ -43,7 +43,8 @@ public class getInfo {
                 System.out.println("---");
                 for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
                 	    for (Data.Section section: sectionPath) {
-                        System.out.println(section.getHeading());
+                	    	   //System.out.println(section);
+                       // System.out.println(section.getHeading());
                     }
                 }
                 System.out.println("---");

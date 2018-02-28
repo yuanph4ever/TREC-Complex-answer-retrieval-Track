@@ -1,4 +1,4 @@
-package prototype1;
+package edu.unh.cs980;
 
 //import static org.hamcrest.CoreMatchers.instanceOf;
 

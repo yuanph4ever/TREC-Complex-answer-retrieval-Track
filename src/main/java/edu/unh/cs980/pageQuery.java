@@ -48,7 +48,7 @@ import org.xml.sax.SAXParseException;
 public class pageQuery {
 	
 	private static void usage() {
-        System.out.println("Command line parameters: Outline_CBOR Lucene_INDEX Output_Dir *Clusters_info");
+        System.out.println("Command line parameters: flag Lucene_INDEX Output_Dir *Outline_CBOR *Clusters_info");
         System.exit(-1);
     }
 	
@@ -59,15 +59,21 @@ public class pageQuery {
 		
         System.setProperty("file.encoding", "UTF-8");
         
-        String pagesFile = args[0];
-        String indexPath = args[1];
-        String outputPath = args[2];
-        HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
+        String flag = args[0];
         
-       
+        if(flag.equalsIgnoreCase("-hw")) {
+        	    System.out.println("Query start...");
+            String pagesFile = args[3];
+            String indexPath = args[1];
+            String outputPath = args[2];
+        		HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
+        }
         
-        if (args.length == 4) {
-        		String clusters = args[3];
+        if (flag == "-cluster") {
+            String pagesFile = args[3];
+            String indexPath = args[1];
+            String outputPath = args[2];
+        		String clusters = args[4];
         		File rf = new File(outputPath + "/runfile_page_with_clusters");
         		rf.createNewFile();
         		FileWriter wtr = new FileWriter(rf); 	
@@ -173,55 +179,69 @@ public class pageQuery {
              
         }
         
-        
-        File runfile = new File(outputPath + "/runfile_page_vectors");
-		runfile.createNewFile();
-		FileWriter writer = new FileWriter(runfile);		
-        
-        //paragraphs-run-pages
-		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
-        searcher.setSimilarity(new BM25Similarity());
-        final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
-        final FileInputStream fileInputStream = new FileInputStream(new File(pagesFile));
-        
-        System.out.println("starting searching for pages ...");
-        
-        int count = 0;
-        
-        for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
-        	
-            final String queryId = page.getPageId();
-
-            String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList(), 1);
-
-            TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
-            ScoreDoc[] scoreDoc = tops.scoreDocs;
-            for (int i = 0; i < scoreDoc.length; i++) {
-                ScoreDoc score = scoreDoc[i];
-                final Document doc = searcher.doc(score.doc); // to access stored content
-                // print score and internal docid
-                final String paragraphid = doc.getField("paragraphid").stringValue();
-                final float searchScore = score.score;
-                final int searchRank = i+1;
-                
-                //---
-                final String para_text = doc.getField("text").stringValue();
-
-                //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
-                System.out.println(".");
-                writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25" + " // " + queryStr + 
-                		" // " + para_text + "\n");
-                count ++;
-            }
-            
-            writer.write("---\n");
-
+        if(flag.equalsIgnoreCase("-v")) {
+        	    System.out.println("Start getting vector for paragraph");
+        	    String indexPath = args[1];
+            String outputPath = args[2];
+        		getVforP v = new getVforP(indexPath, outputPath);
         }
         
-        writer.flush();//why flush?
-		writer.close();
+        if(flag == "r+") {
+        	    String indexPath = args[1];
+            String outputPath = args[2];
+            String pagesFile = args[3];
+        		File runfile = new File(outputPath + "/runfile_page_vectors");
+        		runfile.createNewFile();
+        		FileWriter writer = new FileWriter(runfile);		
+            
+            //paragraphs-run-pages
+        		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
+            searcher.setSimilarity(new BM25Similarity());
+            final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
+            final FileInputStream fileInputStream = new FileInputStream(new File(pagesFile));
+            
+            System.out.println("starting searching for pages ...");
+            
+            int count = 0;
+            
+            for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
+            	
+                final String queryId = page.getPageId();
+
+                String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList(), 1);
+
+                TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
+                ScoreDoc[] scoreDoc = tops.scoreDocs;
+                for (int i = 0; i < scoreDoc.length; i++) {
+                    ScoreDoc score = scoreDoc[i];
+                    final Document doc = searcher.doc(score.doc); // to access stored content
+                    // print score and internal docid
+                    final String paragraphid = doc.getField("paragraphid").stringValue();
+                    final float searchScore = score.score;
+                    final int searchRank = i+1;
+                    
+                    //---
+                    final String para_text = doc.getField("text").stringValue();
+
+                    //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
+                    System.out.println(".");
+                    writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25" + " // " + queryStr + 
+                    		" // " + para_text + "\n");
+                    count ++;
+                }
+                
+                writer.write("---\n");
+
+            }
+            
+            writer.flush();//why flush?
+    			writer.close();
+    			
+    			System.out.println("Write " + count + " results\nQuery Done!");  
+        	
+        }
         
-        System.out.println("Write " + count + " results\nQuery Done!");      
+            
         
 	}
 	

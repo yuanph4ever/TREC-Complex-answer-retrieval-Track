@@ -30,19 +30,19 @@ import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 public class paraIndexer_v {
 	
 	private static void usage() {
-        System.out.println("Command line parameters: program_name paragraphCBOR LuceneINDEX");
+        System.out.println("Command line parameters: paragraphCBOR LuceneINDEX");
         System.exit(-1);
     }
 	
 		public static void main(String[] args) throws IOException {
 			
-			if (args.length < 3)
+			if (args.length < 2)
 	            usage();
 			
 	        System.setProperty("file.encoding", "UTF-8");
 
-	        String paragraphsFile = args[1];
-	        String indexPath = args[2];
+	        String paragraphsFile = args[0];
+	        String indexPath = args[1];
 	        
 	        FileInputStream fileInputStream = new FileInputStream(new File(paragraphsFile));
 
