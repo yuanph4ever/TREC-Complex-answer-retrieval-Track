@@ -28,3 +28,4 @@ It demands two paths: 1) The path of input file (the output path of step4)
 		          2) The output file location where the ranking can be stored.
 
 Constraints: Since it demands DBpedia spotlight installation and curl command installation. I have provided the input file. I will provide the input file of step5.
+The file name is curloutput.txt (It is the runfie generated after all the linking has been done it is categorized.)
