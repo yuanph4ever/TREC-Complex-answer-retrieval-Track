@@ -11,12 +11,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/paul.yuan/Desktop/cs853/cbor-0.4.jar"/>
-	<classpathentry kind="lib" path="/Users/paul.yuan/Desktop/cs853/commons-lang3-3.6.jar"/>
-	<classpathentry kind="lib" path="/Users/paul.yuan/Desktop/cs853/jsoup-1.7.3.jar"/>
-	<classpathentry kind="lib" path="/Users/paul.yuan/Desktop/cs853/lucene-analyzers-common-6.6.0.jar"/>
-	<classpathentry kind="lib" path="/Users/paul.yuan/Desktop/cs853/lucene-core-6.6.0.jar"/>
-	<classpathentry kind="lib" path="/Users/paul.yuan/Desktop/cs853/lucene-demo-6.6.0.jar"/>
-	<classpathentry kind="lib" path="/Users/paul.yuan/Desktop/cs853/lucene-queryparser-6.6.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

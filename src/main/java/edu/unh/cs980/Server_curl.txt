@@ -1,8 +1,0 @@
-Command to run the server:
-
-java -Xms512m -Xmx6000m -d64 -jar dbpedia-spotlight-latest.jar en http://localhost:2222/rest
-
-Curl command that can also run in command line:
-
-curl http://localhost:2222/rest/annotate -H "Accept: text/xml" --data-urlencode "text=<data input>" --data "confidence=0" --data "support=0" >> C:\Users\ddash\Documents\Spring2018\Data_Science\dbPedia_output_files\1_chocolate.txt
-

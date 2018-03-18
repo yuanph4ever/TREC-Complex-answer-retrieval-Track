@@ -39,21 +39,22 @@ import java.io.FileWriter;
 
 public class HeadingWeights {
 
-//	public static void main(String[] args) throws IOException {
-//
-//		System.setProperty("file.encoding", "UTF-8");
-//
-//		String pagesFile = args[0];
-//		String indexPath = args[1];
-//		String outputPath = args[2];
-//		System.out.println(" Results written to the runFile");
-//
-//	}
-	
-	public HeadingWeights(String pagesFile, String indexPath, String outputPath) throws IOException
-	{
+	public static void main(String[] args) throws IOException {
+
+		System.setProperty("file.encoding", "UTF-8");
+
+		String pagesFile = args[0];
+		String indexPath = args[1];
+		String outputPath = args[2];
 		computeHeadingWeights(outputPath, indexPath, pagesFile);
+		System.out.println(" Results written to the runFile");
+
 	}
+	
+//	public HeadingWeights(String pagesFile, String indexPath, String outputPath) throws IOException
+//	{
+//		computeHeadingWeights(outputPath, indexPath, pagesFile);
+//	}
 
 	private static void computeHeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
 		// TODO Auto-generated method stub
