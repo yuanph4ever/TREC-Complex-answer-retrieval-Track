@@ -36,7 +36,7 @@ public class DBpediaAnnotator {
 			usage();
 		}
 		
-		/*
+		/* test
 		String input = "Obama was born in 1961 in Honolulu, Hawaii, two years after the territory was admitted to the Union as the 50th state.";
 		String httpUrl = spotlightAPIurl + "text=" + input.replace(" ", "%20");
 		String responseStr = getHttpResponse(httpUrl);
