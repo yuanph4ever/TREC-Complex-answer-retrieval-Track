@@ -1,6 +1,7 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.kmeans;
 
 import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +45,7 @@ import org.apache.lucene.util.BytesRef;
 
 import edu.unh.cs.treccar_v2.Data;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
-import edu.unh.cs980.sectionQuery.MyQueryBuilder;
+import edu.unh.cs980.yTools.sectionQuery.MyQueryBuilder;
 
 public class getVectorForP {
 	

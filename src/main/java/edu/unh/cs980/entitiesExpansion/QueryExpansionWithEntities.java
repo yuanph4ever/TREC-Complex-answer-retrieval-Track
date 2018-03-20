@@ -1,10 +1,11 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.entitiesExpansion;
 
 import edu.unh.cs.treccar_v2.Data;
+
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
-import edu.unh.cs980.peihao.sectionQuery.MyQueryBuilder;
+import edu.unh.cs980.yTools.sectionQuery.MyQueryBuilder;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;

@@ -1,4 +1,4 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.yTools;
 
 import edu.unh.cs.treccar_v2.Data;
 
@@ -115,7 +115,7 @@ public class sectionQuery {
 	}
 	
 	//Author: Laura dietz
-		static class MyQueryBuilder {
+		public static class MyQueryBuilder {
 
 	        private final StandardAnalyzer analyzer;
 	        private List<String> tokens;

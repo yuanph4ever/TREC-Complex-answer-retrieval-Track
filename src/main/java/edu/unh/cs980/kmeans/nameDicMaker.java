@@ -1,4 +1,4 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.kmeans;
 
 import java.io.File;
 import java.io.FileInputStream;

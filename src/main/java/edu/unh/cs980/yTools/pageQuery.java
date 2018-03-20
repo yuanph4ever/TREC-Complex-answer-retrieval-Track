@@ -1,12 +1,15 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.yTools;
 
 import edu.unh.cs.treccar_v2.Data;
+
 
 
 
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
+import edu.unh.cs980.kmeans.getVforP;
+
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -62,13 +65,13 @@ public class pageQuery {
         
         String flag = args[0];
         
-        if(flag.equalsIgnoreCase("-hw")) {
-        	    System.out.println("Query start...");
-            String pagesFile = args[3];
-            String indexPath = args[1];
-            String outputPath = args[2];
-        		HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
-        }
+//        if(flag.equalsIgnoreCase("-hw")) {
+//        	    System.out.println("Query start...");
+//            String pagesFile = args[3];
+//            String indexPath = args[1];
+//            String outputPath = args[2];
+//        		HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
+//        }
         
         if (flag == "-cluster") {
             String pagesFile = args[3];
