@@ -36,6 +36,7 @@ import java.io.StringReader;
 import java.net.PasswordAuthentication;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,25 +66,136 @@ public class HeadingWeights {
 		// cph.trainclassifier(passageHeadings);
 
 		createArffDataset(passageHeadings, outputPath + "/pageAr");
+		//sampleArff(outputPath);
+
+	}
+
+	private static void sampleArff(String path) throws ParseException, IOException {
+		// TODO Auto-generated method stub
+		FastVector atts;
+		FastVector attsRel;
+		FastVector attVals;
+		FastVector attValsRel;
+		Instances data;
+		Instances dataRel;
+		double[] vals;
+		double[] valsRel;
+		int i;
+
+		// 1. set up attributes
+		atts = new FastVector();
+		// - numeric
+		atts.addElement(new Attribute("att1"));
+		// - nominal
+		attVals = new FastVector();
+		for (i = 0; i < 5; i++)
+			attVals.addElement("val" + (i + 1));
+		atts.addElement(new Attribute("att2", attVals));
+		// - string
+		atts.addElement(new Attribute("att3", (FastVector) null));
+		// - date
+		atts.addElement(new Attribute("att4", "yyyy-MM-dd"));
+		// - relational
+		attsRel = new FastVector();
+		// -- numeric
+		attsRel.addElement(new Attribute("att5.1"));
+		// -- nominal
+		attValsRel = new FastVector();
+		for (i = 0; i < 5; i++)
+			attValsRel.addElement("val5." + (i + 1));
+		attsRel.addElement(new Attribute("att5.2", attValsRel));
+		dataRel = new Instances("att5", attsRel, 0);
+		atts.addElement(new Attribute("att5", dataRel, 0));
+
+		// 2. create Instances object
+		data = new Instances("MyRelation", atts, 0);
+
+		// 3. fill with data
+		// first instance
+		vals = new double[data.numAttributes()];
+		// - numeric
+		vals[0] = Math.PI;
+		// - nominal
+		vals[1] = attVals.indexOf("val3");
+		// - string
+		vals[2] = data.attribute(2).addStringValue("This is a string!");
+		// - date
+		vals[3] = data.attribute(3).parseDate("2001-11-09");
+		// - relational
+		dataRel = new Instances(data.attribute(4).relation(), 0);
+		// -- first instance
+		valsRel = new double[2];
+		valsRel[0] = Math.PI + 1;
+		valsRel[1] = attValsRel.indexOf("val5.3");
+		dataRel.add(new Instance(1.0, valsRel));
+		// -- second instance
+		valsRel = new double[2];
+		valsRel[0] = Math.PI + 2;
+		valsRel[1] = attValsRel.indexOf("val5.2");
+		dataRel.add(new Instance(1.0, valsRel));
+		vals[4] = data.attribute(4).addRelation(dataRel);
+		// add
+		data.add(new Instance(1.0, vals));
+
+		// second instance
+		vals = new double[data.numAttributes()]; // important: needs NEW array!
+		// - numeric
+		vals[0] = Math.E;
+		// - nominal
+		vals[1] = attVals.indexOf("val1");
+		// - string
+		vals[2] = data.attribute(2).addStringValue("And another one!");
+		// - date
+		vals[3] = data.attribute(3).parseDate("2000-12-01");
+		// - relational
+		dataRel = new Instances(data.attribute(4).relation(), 0);
+		// -- first instance
+		valsRel = new double[2];
+		valsRel[0] = Math.E + 1;
+		valsRel[1] = attValsRel.indexOf("val5.4");
+		dataRel.add(new Instance(1.0, valsRel));
+		// -- second instance
+		valsRel = new double[2];
+		valsRel[0] = Math.E + 2;
+		valsRel[1] = attValsRel.indexOf("val5.1");
+		dataRel.add(new Instance(1.0, valsRel));
+		vals[4] = data.attribute(4).addRelation(dataRel);
+		// add
+		data.add(new Instance(1.0, vals));
+
+		// 4. output data
+		System.out.println(data);
+		
+		File f = new File(path+"/Sample" + ".arff");
+		f.createNewFile();
+		FileWriter fw = new FileWriter(f);
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(data.toString());
+		bw.close();
+		System.out.println("check for arff file");
 
 	}
 
 	private static void createArffDataset(Map<String, List<String>> passageHeadings2, String path) throws IOException {
 		// TODO Auto-generated method stub
 		FastVector attr = getAttributes(passageHeadings2);
+		double[] vals;
 		Instances data = new Instances("trainingFiles", attr, 0);
-		double[] newInst = new double[attr.capacity()];
-		for(int i = 0; i<attr.size(); i++)
+		vals = new double[data.numAttributes()];
+		int index = 0;
+		for(Entry<String, List<String>> entry : passageHeadings2.entrySet())
 		{
-			newInst[i] = (double)data.attribute(i).addStringValue("Hello");
+			vals[index] = data.attribute(index).addStringValue(entry.getValue().toString());
+			index++;
+			data.add(new Instance(1.0, vals));
 		}
+
 		
-		data.add(new Instance(1.0, newInst));
-		
-		File f=new File(path +".ARFF");
+
+		File f = new File(path + ".arff");
 		f.createNewFile();
-		FileWriter fw=new FileWriter(f);
-		BufferedWriter bw=new BufferedWriter(fw);
+		FileWriter fw = new FileWriter(f);
+		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(data.toString());
 		bw.close();
 		System.out.println("check for arff file");
@@ -91,17 +203,30 @@ public class HeadingWeights {
 
 	private static FastVector getAttributes(Map<String, List<String>> passageHeadings2) {
 
-		FastVector attr, classValues;
+		FastVector attr;
+		FastVector classValues;
 		attr = new FastVector(passageHeadings2.size());
-		classValues = new FastVector();
+		StringBuffer s = new StringBuffer();
 		List<String> classValueList = new ArrayList<String>();
+		ArrayList<List<String>> listOfList = new ArrayList<List<String>>();
 		for (Entry<String, List<String>> entry : passageHeadings2.entrySet()) {
-			attr.addElement(new Attribute(entry.getKey().toString()));
-			classValues.addElement(new Attribute(entry.getValue().toString()));
+			attr.addElement(new Attribute(entry.getKey().toString(), (FastVector) null));
+			listOfList.add(entry.getValue());
 		}
-		
+
+		classValues = new FastVector(listOfList.size());
+		for (List<String> l : listOfList) {
+			for (String e : l) {
+				if (classValues.contains(e)) {
+					continue;
+				} else {
+					classValues.addElement(e);
+				}
+			}
+
+		}
 		attr.addElement(new Attribute("Class", classValues));
-		
+
 		return attr;
 	}
 
@@ -135,7 +260,7 @@ public class HeadingWeights {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 1);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 			paragraphs = new ArrayList<String>();
 			for (int i = 0; i < scoreDoc.length; i++) {
