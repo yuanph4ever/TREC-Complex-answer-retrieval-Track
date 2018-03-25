@@ -14,6 +14,7 @@ import java.util.List;
 
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 
@@ -27,17 +28,35 @@ public class ClassifyPassageHeadings {
 	static String dirParagraphCorpus = "";
 	static String resultsDir = "";
 	
-	public RandomForest trainclassifier() throws Exception
+	public RandomForest trainclassifier(Map<String, List<String>> trainingSet) throws Exception
     {
-		int numTopics = 40;
+		int numTopics = 10;
 		int seed  = 1;
 		int folds = 10;
-		DataSource trainSource = new DataSource("");
-		RandomForest classifier=new RandomForest();
-		System.out.println("Training with "+classifier.getClass().getName());
+//		DataSource trainSource = new DataSource("");
+//		RandomForest classifier=new RandomForest();
+//		System.out.println("Training with "+classifier.getClass().getName());
+		
+		for(Entry<String, List<String>> entry : trainingSet.entrySet())
+		{
+			String headingName = entry.getKey();
+			
+			for(String para : entry.getValue() )
+			{
+				System.out.println(headingName + " - " + para);
+			}
+			
+		}
+		
+		
 		return null;
+		
+		
     	
     }
+	
+	
+	
 
 	
 	
