@@ -66,7 +66,7 @@ public class HeadingWeights {
 		// cph.trainclassifier(passageHeadings);
 
 		createArffDataset(passageHeadings, outputPath + "/pageAr");
-		//sampleArff(outputPath);
+		// sampleArff(outputPath);
 
 	}
 
@@ -165,8 +165,8 @@ public class HeadingWeights {
 
 		// 4. output data
 		System.out.println(data);
-		
-		File f = new File(path+"/Sample" + ".arff");
+
+		File f = new File(path + "/Sample" + ".arff");
 		f.createNewFile();
 		FileWriter fw = new FileWriter(f);
 		BufferedWriter bw = new BufferedWriter(fw);
@@ -179,19 +179,32 @@ public class HeadingWeights {
 	private static void createArffDataset(Map<String, List<String>> passageHeadings2, String path) throws IOException {
 		// TODO Auto-generated method stub
 		FastVector attr = getAttributes(passageHeadings2);
-		double[] vals;
+		
 		Instances data = new Instances("trainingFiles", attr, 0);
-		vals = new double[data.numAttributes()];
-		int index = 0;
+		
+		double[] values;		
+		values = new double[data.numAttributes()];
+		double[] vals;
+		List<String> valueList;
+		int attrIndex = 0;
 		for(Entry<String, List<String>> entry : passageHeadings2.entrySet())
 		{
-			vals[index] = data.attribute(index).addStringValue(entry.getValue().toString());
-			index++;
-			data.add(new Instance(1.0, vals));
+			valueList = new ArrayList<String>();
+			for(String e : entry.getValue())
+			{
+				valueList.add(e);
+			}
+			vals = new double[valueList.size()];
+			int i = 0;
+			for(String e1 : entry.getValue())
+			{
+				vals[i] = data.attribute(attrIndex).addStringValue(e1);
+				data.add(new Instance(1.0, vals));
+				i++;
+			}
+			attrIndex++;
 		}
-
-		
-
+	
 		File f = new File(path + ".arff");
 		f.createNewFile();
 		FileWriter fw = new FileWriter(f);
@@ -209,22 +222,24 @@ public class HeadingWeights {
 		StringBuffer s = new StringBuffer();
 		List<String> classValueList = new ArrayList<String>();
 		ArrayList<List<String>> listOfList = new ArrayList<List<String>>();
+		attr.addElement(new Attribute("Page Heading", (FastVector) null));
 		for (Entry<String, List<String>> entry : passageHeadings2.entrySet()) {
-			attr.addElement(new Attribute(entry.getKey().toString(), (FastVector) null));
-			listOfList.add(entry.getValue());
+			
+				attr.addElement(new Attribute(entry.getKey(), (FastVector) null));
+		
+			classValueList.add(entry.getKey());
 		}
 
-		classValues = new FastVector(listOfList.size());
-		for (List<String> l : listOfList) {
-			for (String e : l) {
-				if (classValues.contains(e)) {
-					continue;
-				} else {
-					classValues.addElement(e);
-				}
+		classValues = new FastVector(classValueList.size());
+
+		for (String e : classValueList) {
+			if (classValues.contains(e)) {
+				continue;
+			} else {
+				classValues.addElement(e);
 			}
-
 		}
+
 		attr.addElement(new Attribute("Class", classValues));
 
 		return attr;
@@ -260,7 +275,7 @@ public class HeadingWeights {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 1);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 			paragraphs = new ArrayList<String>();
 			for (int i = 0; i < scoreDoc.length; i++) {
