@@ -8,6 +8,7 @@ import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 import edu.unh.cs980.Classifier.ClassifyPassageHeadings;
+import edu.unh.cs980.Classifier.TopicModelGenerator;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -65,8 +66,10 @@ public class HeadingWeights {
 		// ClassifyPassageHeadings cph = new ClassifyPassageHeadings();
 		// cph.trainclassifier(passageHeadings);
 
-		createArffDataset(passageHeadings, outputPath + "/pageAr");
-		// sampleArff(outputPath);
+//		createArffDataset(passageHeadings, outputPath + "/pageAr");
+		
+		TopicModelGenerator tmg = new TopicModelGenerator(passageHeadings, outputPath + "/pageAr");
+		
 
 	}
 
@@ -181,14 +184,14 @@ public class HeadingWeights {
 		FastVector attr = getAttributes(passageHeadings2);
 		
 		Instances data = new Instances("trainingFiles", attr, 0);
-		
 		double[] values;		
-		values = new double[data.numAttributes()];
+		//values = new double[data.numAttributes()];
 		double[] vals;
 		List<String> valueList;
-		int attrIndex = 0;
+//		int attrIndex = 0;
 		for(Entry<String, List<String>> entry : passageHeadings2.entrySet())
 		{
+			System.out.println("coming");
 			valueList = new ArrayList<String>();
 			for(String e : entry.getValue())
 			{
@@ -198,11 +201,12 @@ public class HeadingWeights {
 			int i = 0;
 			for(String e1 : entry.getValue())
 			{
-				vals[i] = data.attribute(attrIndex).addStringValue(e1);
+				vals[i] = data.attribute("Page_Heading").addStringValue(e1);
 				data.add(new Instance(1.0, vals));
+				data.setClassIndex(data.numAttributes() - 1);
 				i++;
 			}
-			attrIndex++;
+//			attrIndex++;
 		}
 	
 		File f = new File(path + ".arff");
@@ -222,10 +226,10 @@ public class HeadingWeights {
 		StringBuffer s = new StringBuffer();
 		List<String> classValueList = new ArrayList<String>();
 		ArrayList<List<String>> listOfList = new ArrayList<List<String>>();
-		attr.addElement(new Attribute("Page Heading", (FastVector) null));
+		attr.addElement(new Attribute("Page_Heading", (FastVector) null));
 		for (Entry<String, List<String>> entry : passageHeadings2.entrySet()) {
 			
-				attr.addElement(new Attribute(entry.getKey(), (FastVector) null));
+//				attr.addElement(new Attribute(entry.getKey(), (FastVector) null));
 		
 			classValueList.add(entry.getKey());
 		}
@@ -275,7 +279,7 @@ public class HeadingWeights {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 2);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 			paragraphs = new ArrayList<String>();
 			for (int i = 0; i < scoreDoc.length; i++) {
