@@ -279,7 +279,7 @@ public class HeadingWeights {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 2);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 			paragraphs = new ArrayList<String>();
 			for (int i = 0; i < scoreDoc.length; i++) {
