@@ -51,15 +51,19 @@ import edu.unh.cs.treccar_v2.read_data.DeserializeData;
  * according to their relevance to a given search query. 
  */
 public class BM25 {
+	
+	// Environment Variables for map of query and the paragraph
+	// Right now using these maps to feed the data to classifier
 
 	static List<String> paragraphs;
 	static Map<String, List<String>> passageHeadings = new HashMap<String, List<String>>();
 	
-	List<String> pageParagraphs;
-	List<String> sectionParagraphs;
+	private List<String> pageParagraphs;
+	private List<String> sectionParagraphs;
+	private List<String> lowSectionParagraphs;
 	
-	Map<String, List<String>> mapPagePassage;
-	Map<String, List<String>> mapSectionPassage;
+	private Map<String, List<String>> mapPagePassage;
+	private Map<String, List<String>> mapSectionPassage;
 	
 
 	/*
@@ -72,11 +76,6 @@ public class BM25 {
 	public BM25(String pagesFile, String indexPath, String outputPath) throws IOException {
 		System.setProperty("file.encoding", "UTF-8");
 		computeHeadingWeights(outputPath, indexPath, pagesFile);
-	}
-
-	// Default constructor 
-	public BM25() {
-				
 	}
 
 	/*
@@ -115,7 +114,7 @@ public class BM25 {
 
 			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
-			paragraphs = new ArrayList<String>();
+			pageParagraphs = new ArrayList<String>();
 			for (int i = 0; i < scoreDoc.length; i++) {
 				ScoreDoc score = scoreDoc[i];
 				final Document doc = searcher.doc(score.doc); // to access
@@ -127,14 +126,14 @@ public class BM25 {
 				final float searchScore = score.score;
 				final int searchRank = i + 1;
 
-				paragraphs.add(paragraph);
+				pageParagraphs.add(paragraph);
 
 				System.out.println(".");
 				// writer.write(queryStr + " - " + paragraph + "\n");
 				writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
 				count++;
 			}
-			passageHeadings.put(queryStr, paragraphs);
+			mapPagePassage.put(queryStr, paragraphs);
 
 		}
 
@@ -159,6 +158,7 @@ public class BM25 {
 		System.out.println("starting searching for sections ...");
 
 		int count = 0;
+		mapPagePassage = new HashMap<String, List<String>>();
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 			for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
@@ -167,6 +167,7 @@ public class BM25 {
 				String queryStr = buildSectionQueryStr(page, sectionPath);
 				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
+				sectionParagraphs = new ArrayList<String>();
 				for (int i = 0; i < scoreDoc.length; i++) {
 					ScoreDoc score = scoreDoc[i];
 					final Document doc = searcher.doc(score.doc); // to access
@@ -177,16 +178,15 @@ public class BM25 {
 					final String paragraph = doc.getField("content").stringValue();
 					final float searchScore = score.score;
 					final int searchRank = i + 1;
-					// System.out.println(page.getPageName() + " " + queryStr);
-					// System.out.println(queryId+" Q0 "+paragraphid+"
-					// "+searchRank + " "+searchScore+" Lucene-BM25");
-					// passageHeadings.put(queryStr, paragraph);
+					sectionParagraphs.add(paragraph);
 					System.out.println(".");
 					writer.write(
 							queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
 					count++;
 
 				}
+				
+				mapSectionPassage.put(queryStr, paragraphs);
 
 			}
 		}
@@ -214,6 +214,8 @@ public class BM25 {
 		System.out.println("starting searching for sections ...");
 
 		int count = 0;
+		
+		mapSectionPassage = new HashMap<String, List<String>>();
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 			for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
@@ -341,6 +343,14 @@ public class BM25 {
 
 		}
 		return queryStr;
+	}
+
+
+
+
+	public Map<String, List<String>> getPageHeadingMap() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
