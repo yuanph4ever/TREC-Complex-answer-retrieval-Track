@@ -50,7 +50,7 @@ public class J48Classifier{
   System.out.println(tree);
   
 
-  double pred = tree.classifyInstance("tree");
-  System.out.println("====== RESULT ====== \tCLASSIFIED AS:\t" + );
+//  double pred = tree.classifyInstance("tree");
+  //System.out.println("====== RESULT ====== \tCLASSIFIED AS:\t" + );
  }
 }

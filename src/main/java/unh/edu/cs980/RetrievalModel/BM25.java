@@ -1,90 +1,99 @@
-package edu.unh.cs980;
-
-import edu.unh.cs.treccar_v2.Data;
-
-
-import edu.unh.cs.treccar_v2.Data.PageSkeleton;
-import edu.unh.cs.treccar_v2.Data.Section;
-import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
-import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
-import edu.unh.cs.treccar_v2.read_data.DeserializeData;
-import edu.unh.cs980.Classifier.ClassifyPassageHeadings;
-import edu.unh.cs980.Classifier.TopicModelGenerator;
-import weka.core.Attribute;
-import weka.core.FastVector;
-import weka.core.Instance;
-import weka.core.Instances;
-
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.*;
-import org.apache.lucene.search.*;
-import org.apache.lucene.search.similarities.BM25Similarity;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.jetbrains.annotations.NotNull;
-import org.netlib.util.doubleW;
+package unh.edu.cs980.RetrievalModel;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.PasswordAuthentication;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.io.FileWriter;
 
-public class HeadingWeights {
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+
+import edu.unh.cs.treccar_v2.Data;
+import edu.unh.cs.treccar_v2.Data.PageSkeleton;
+import edu.unh.cs.treccar_v2.Data.Section;
+import edu.unh.cs.treccar_v2.read_data.DeserializeData;
+
+/*
+ * 
+ * Author : Nithin
+
+ * Date: 03/28/18
+ * Time: 3:10 PM
+ *
+ * ranking function used by lucene search engines to rank matching documents 
+ * according to their relevance to a given search query. 
+ */
+public class BM25 {
 
 	static List<String> paragraphs;
 	static Map<String, List<String>> passageHeadings = new HashMap<String, List<String>>();
+	
+	List<String> pageParagraphs;
+	List<String> sectionParagraphs;
+	
+	Map<String, List<String>> mapPagePassage;
+	Map<String, List<String>> mapSectionPassage;
+	
 
-	public static void main(String[] args) throws Exception {
-
+	/*
+	 * @param 1 = query File ( usually outlines.cbor)
+	 * 
+	 * @param 2 = Index path of Paragraph corpus
+	 * 
+	 * @param 3 = path where the run File have to be genrated in the system
+	 */
+	public BM25(String pagesFile, String indexPath, String outputPath) throws IOException {
 		System.setProperty("file.encoding", "UTF-8");
-
-		String pagesFile = args[0];
-		String indexPath = args[1];
-		String outputPath = args[2];
 		computeHeadingWeights(outputPath, indexPath, pagesFile);
-		// System.out.println(" Results written to the runFile");
-		// ClassifyPassageHeadings cph = new ClassifyPassageHeadings();
-		// cph.trainclassifier(passageHeadings);
-
-//		createArffDataset(passageHeadings, outputPath + "/pageAr");
-		
-		TopicModelGenerator tmg = new TopicModelGenerator(passageHeadings, outputPath + "/pageAr");
-		
-
 	}
 
-	private static void computeHeadingWeights(String outputPath, String indexPath, String pagesFile)
-			throws IOException {
+	// Default constructor 
+	public BM25() {
+				
+	}
+
+	/*
+	 * retrieve passage for 1. using page name as Query 2. Using page name +
+	 * section name as query ( Entire Hierarchy - Example H1/H1.1/H1.1.1) 3.
+	 * Using page name and lowest section of the page as Query ( Example - just
+	 * H1/ H1.n)
+	 */
+	private void computeHeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
 		// TODO Auto-generated method stub
 		PageSearch(outputPath, indexPath, pagesFile);
-		// SectionSearch(outputPath, indexPath, pagesFile);
-		// SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
+		SectionSearch(outputPath, indexPath, pagesFile);
+		SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
 
 	}
 
-	// Author : Nithin
-	private static void PageSearch(String outputPath, String indexPath, String pagesFile) throws IOException {
+	private void PageSearch(String outputPath, String indexPath, String pagesFile) throws IOException {
 		File runfile = new File(outputPath + "/runfile_page");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
@@ -133,10 +142,10 @@ public class HeadingWeights {
 		writer.close();
 
 		System.out.println("Write " + count + " results\nQuery Done!");
+
 	}
 
-	// Author : Nithin
-	private static void SectionSearch(String outputPath, String indexPath, String pagesFile) throws IOException {
+	private void SectionSearch(String outputPath, String indexPath, String pagesFile) throws IOException {
 		File runfile = new File(outputPath + "/runfile_section");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
@@ -190,8 +199,7 @@ public class HeadingWeights {
 
 	}
 
-	// Author : Nithin
-	private static void SectionSearchForLowestHeading(String outputPath, String indexPath, String pagesFile)
+	private void SectionSearchForLowestHeading(String outputPath, String indexPath, String pagesFile)
 			throws IOException {
 		File runfile = new File(outputPath + "/runfile_section_lowestheading");
 		runfile.createNewFile();
