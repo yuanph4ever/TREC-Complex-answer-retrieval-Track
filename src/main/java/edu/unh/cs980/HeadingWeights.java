@@ -3,13 +3,13 @@ package edu.unh.cs980;
 import edu.unh.cs.treccar_v2.Data;
 
 
+
 import edu.unh.cs.treccar_v2.Data.PageSkeleton;
 import edu.unh.cs.treccar_v2.Data.Section;
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 import edu.unh.cs980.Classifier.ClassifyPassageHeadings;
-import edu.unh.cs980.Classifier.TopicModelGenerator;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -69,7 +69,7 @@ public class HeadingWeights {
 
 //		createArffDataset(passageHeadings, outputPath + "/pageAr");
 		
-		TopicModelGenerator tmg = new TopicModelGenerator(passageHeadings, outputPath + "/pageAr");
+		//TopicModelGenerator tmg = new TopicModelGenerator(passageHeadings, outputPath + "/pageAr");
 		
 
 	}
