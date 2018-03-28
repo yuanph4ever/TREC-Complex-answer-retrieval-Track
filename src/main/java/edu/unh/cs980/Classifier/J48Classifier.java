@@ -5,6 +5,9 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.core.stemmers.LovinsStemmer;
+
+import java.util.Arrays;
+
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
 import weka.filters.unsupervised.attribute.Remove;
@@ -45,5 +48,9 @@ public class J48Classifier{
 
   System.out.println(tree.graph());
   System.out.println(tree);
+  
+
+  double pred = tree.classifyInstance("tree");
+  System.out.println("====== RESULT ====== \tCLASSIFIED AS:\t" + );
  }
 }
