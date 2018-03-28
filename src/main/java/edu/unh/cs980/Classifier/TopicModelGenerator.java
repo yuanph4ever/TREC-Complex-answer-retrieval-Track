@@ -13,9 +13,14 @@ import java.util.regex.Pattern;
 
 import cc.mallet.pipe.CharSequence2TokenSequence;
 import cc.mallet.pipe.CharSequenceLowercase;
+import cc.mallet.pipe.FeatureSequence2FeatureVector;
+import cc.mallet.pipe.Input2CharSequence;
 import cc.mallet.pipe.Pipe;
+import cc.mallet.pipe.PrintInputAndTarget;
 import cc.mallet.pipe.SerialPipes;
+import cc.mallet.pipe.Target2Label;
 import cc.mallet.pipe.TokenSequence2FeatureSequence;
+import cc.mallet.pipe.TokenSequenceLowercase;
 import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.types.InstanceList;
 import weka.classifiers.Classifier;
@@ -83,28 +88,71 @@ public class TopicModelGenerator implements Serializable {
 
 	private Instance makeInstance(String paragraph, Instances data) {
 		// Create instance of length two.
-
-//		// Begin by importing documents from text to feature sequences
-//		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
-//
-//		// Pipes: lowercase, tokenize, remove stopwords, map to features
-//		pipeList.add(new CharSequenceLowercase());
-//		pipeList.add(new CharSequence2TokenSequence(Pattern.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
-//		pipeList.add(new TokenSequenceRemoveStopwords(new File("inputFiles/stoplists/en.txt"), "UTF-8", false, false,
-//				false));
-//		pipeList.add(new TokenSequence2FeatureSequence());
-
-		
 		Instance instance = new Instance(2);
-		
+
+		InstanceList instances = new InstanceList(buildPipe());
 		
 		// Set value for message attribute
 		Attribute messageAtt = data.attribute("text");
+
 		instance.setValue(messageAtt, messageAtt.addStringValue(paragraph));
 
 		// Give instance access to attribute information from the dataset.
 		instance.setDataset(data);
 		return instance;
+	}
+
+	public Pipe buildPipe() {
+
+		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
+
+		// Pipes: lowercase, tokenize, remove stopwords, map to features
+		pipeList.add(new CharSequenceLowercase());
+		pipeList.add(new CharSequence2TokenSequence(Pattern.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
+		pipeList.add(new TokenSequenceRemoveStopwords(new File("/Users/Nithin/Desktop/stopwords.txt"), "UTF-8", false,
+				false, false));
+		pipeList.add(new TokenSequence2FeatureSequence());
+
+		// Read data from File objects
+		pipeList.add(new Input2CharSequence("UTF-8"));
+
+		// Regular expression for what constitutes a token.
+		// This pattern includes Unicode letters, Unicode numbers,
+		// and the underscore character. Alternatives:
+		// "\\S+" (anything not whitespace)
+		// "\\w+" ( A-Z, a-z, 0-9, _ )
+		// "[\\p{L}\\p{N}_]+|[\\p{P}]+" (a group of only letters and numbers OR
+		// a group of only punctuation marks)
+		Pattern tokenPattern = Pattern.compile("[\\p{L}\\p{N}_]+");
+
+		// Tokenize raw strings
+		pipeList.add(new CharSequence2TokenSequence(tokenPattern));
+
+		// Normalize all tokens to all lowercase
+		pipeList.add(new TokenSequenceLowercase());
+  
+		// Remove stopwords from a standard English stoplist.
+		// options: [case sensitive] [mark deletions]
+		pipeList.add(new TokenSequenceRemoveStopwords(false, false));
+
+		// Rather than storing tokens as strings, convert
+		// them to integers by looking them up in an alphabet.
+		//pipeList.add(new TokenSequence2FeatureSequence());
+
+		// Do the same thing for the "target" field:
+		// convert a class label string to a Label object,
+		// which has an index in a Label alphabet.
+		//pipeList.add(new Target2Label());
+
+		// Now convert the sequence of features to a sparse vector,
+		// mapping feature IDs to counts.
+		pipeList.add(new FeatureSequence2FeatureVector());
+
+		// Print out the features and the label
+		pipeList.add(new PrintInputAndTarget());
+
+		return new SerialPipes(pipeList);
+
 	}
 
 	public void setupAfterHeadingAdded() {
@@ -123,4 +171,5 @@ public class TopicModelGenerator implements Serializable {
 		bw.close();
 		System.out.println("check for arff file");
 	}
+
 }
