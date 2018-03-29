@@ -59,6 +59,10 @@ public class RFClassifier {
 		System.out.println(eval.toSummaryString("=== " + folds + "-fold Cross-validation ===\n", false));
 		System.out.println(eval.toClassDetailsString() + "\n" + eval.toMatrixString() + "\n");
 		classifier.buildClassifier(trainingSet);
+		
+		weka.core.SerializationHelper.write("/Users/Nithin/git/TREC-Complex-answer-retrieval-Track/trainedModel/RF_Page.model", classifier);
+
+		
 		return classifier;
 
 	}

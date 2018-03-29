@@ -31,8 +31,7 @@ public class ClassifyPassageHeadings {
 		rf.trainclassifier(arffFile);
 
 		String text = "rainfall, and the surface runoff which may result from rainfall, produces four main types of soil erosion: splash erosion, sheet erosion, rill erosion, and gully erosion. splash erosion is generally seen as the first and least severe stage in the soil erosion process, which is followed by sheet erosion, then rill erosion and finally gully erosion (the most severe of the four)";
-		RandomForest rand = new RandomForest();
-		//double pred = rf.classifyInstance(data.instance(0));
+		
 	}
 
 }
