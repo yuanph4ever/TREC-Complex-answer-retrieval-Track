@@ -9,6 +9,8 @@ import java.util.Map;
 
 import edu.unh.cs980.Classifier.ClassifyPassageHeadings;
 import edu.unh.cs980.RetrievalModel.BM25;
+import edu.unh.cs980.TopicModel.CreateArrfDataset;
+import edu.unh.cs980.TopicModel.CreateTestSet;
 import edu.unh.cs980.TopicModel.TopicModelGenerator;
 import weka.classifiers.Classifier;
 
@@ -28,15 +30,19 @@ public class Main {
 		Map<String, List<String>> pageHeadingMap = bm25.getPageHeadingMap();
 		Map<String, List<String>> sectionHeadingMap = bm25.getSectionHeadingMap();
 		
-		//TopicModelGenerator tmg = new TopicModelGenerator(pageHeadingMap, outputPath+"/trainPageHeading");
+//		TopicModelGenerator tmg = new TopicModelGenerator(pageHeadingMap, outputPath+"/trainPageHeading");
+//		
+//		System.out.println("Training Set Generated");
+//		
+//		//ClassifyPassageHeadings cpf =  new ClassifyPassageHeadings("/Users/Nithin/Desktop/Runfile/trainPageHeading");
+//		
+//		Classifier cls = (Classifier) weka.core.SerializationHelper.read("/Users/Nithin/git/TREC-Complex-answer-retrieval-Track/trainedModel/RF_Page.model");
+//		
+//		System.out.println();
 		
-		System.out.println("Training Set Generated");
+		CreateTestSet cts = new CreateTestSet(pageHeadingMap, outputPath+"testArrff");
 		
-		//ClassifyPassageHeadings cpf =  new ClassifyPassageHeadings("/Users/Nithin/Desktop/Runfile/trainPageHeading");
 		
-		Classifier cls = (Classifier) weka.core.SerializationHelper.read("/Users/Nithin/git/TREC-Complex-answer-retrieval-Track/trainedModel/RF_Page.model");
-		
-		System.out.println();
 		
 
 	}
