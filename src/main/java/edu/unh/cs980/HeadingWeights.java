@@ -2,11 +2,18 @@ package edu.unh.cs980;
 
 import edu.unh.cs.treccar_v2.Data;
 
+
+
 import edu.unh.cs.treccar_v2.Data.PageSkeleton;
 import edu.unh.cs.treccar_v2.Data.Section;
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
+import edu.unh.cs980.Classifier.ClassifyPassageHeadings;
+import weka.core.Attribute;
+import weka.core.FastVector;
+import weka.core.Instance;
+import weka.core.Instances;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -18,6 +25,7 @@ import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.jetbrains.annotations.NotNull;
+import org.netlib.util.doubleW;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,19 +35,27 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.PasswordAuthentication;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.io.FileWriter;
 
 public class HeadingWeights {
 
-	public static void main(String[] args) throws IOException {
+	static List<String> paragraphs;
+	static Map<String, List<String>> passageHeadings = new HashMap<String, List<String>>();
+
+	public static void main(String[] args) throws Exception {
 
 		System.setProperty("file.encoding", "UTF-8");
 
@@ -47,20 +63,23 @@ public class HeadingWeights {
 		String indexPath = args[1];
 		String outputPath = args[2];
 		computeHeadingWeights(outputPath, indexPath, pagesFile);
-		System.out.println(" Results written to the runFile");
+		// System.out.println(" Results written to the runFile");
+		// ClassifyPassageHeadings cph = new ClassifyPassageHeadings();
+		// cph.trainclassifier(passageHeadings);
+
+//		createArffDataset(passageHeadings, outputPath + "/pageAr");
+		
+		//TopicModelGenerator tmg = new TopicModelGenerator(passageHeadings, outputPath + "/pageAr");
+		
 
 	}
-	
-//	public HeadingWeights(String pagesFile, String indexPath, String outputPath) throws IOException
-//	{
-//		computeHeadingWeights(outputPath, indexPath, pagesFile);
-//	}
 
-	private static void computeHeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
+	private static void computeHeadingWeights(String outputPath, String indexPath, String pagesFile)
+			throws IOException {
 		// TODO Auto-generated method stub
 		PageSearch(outputPath, indexPath, pagesFile);
-		SectionSearch(outputPath, indexPath, pagesFile);
-		SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
+		// SectionSearch(outputPath, indexPath, pagesFile);
+		// SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
 
 	}
 
@@ -85,8 +104,9 @@ public class HeadingWeights {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
+			paragraphs = new ArrayList<String>();
 			for (int i = 0; i < scoreDoc.length; i++) {
 				ScoreDoc score = scoreDoc[i];
 				final Document doc = searcher.doc(score.doc); // to access
@@ -94,13 +114,18 @@ public class HeadingWeights {
 																// content
 				// print score and internal docid
 				final String paragraphid = doc.getField("paragraphid").stringValue();
+				final String paragraph = doc.getField("text").stringValue();
 				final float searchScore = score.score;
 				final int searchRank = i + 1;
 
+				paragraphs.add(paragraph);
+
 				System.out.println(".");
+				// writer.write(queryStr + " - " + paragraph + "\n");
 				writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
 				count++;
 			}
+			passageHeadings.put(queryStr, paragraphs);
 
 		}
 
@@ -140,11 +165,13 @@ public class HeadingWeights {
 																	// content
 					// print score and internal docid
 					final String paragraphid = doc.getField("paragraphid").stringValue();
+					final String paragraph = doc.getField("content").stringValue();
 					final float searchScore = score.score;
 					final int searchRank = i + 1;
-					//System.out.println(page.getPageName() + " " + queryStr);
+					// System.out.println(page.getPageName() + " " + queryStr);
 					// System.out.println(queryId+" Q0 "+paragraphid+"
 					// "+searchRank + " "+searchScore+" Lucene-BM25");
+					// passageHeadings.put(queryStr, paragraph);
 					System.out.println(".");
 					writer.write(
 							queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
@@ -184,7 +211,9 @@ public class HeadingWeights {
 			for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
 
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
-				String queryStr = buildSectionQueryStr(sectionPath); // get the lowest heading
+				String queryStr = buildSectionQueryStr(sectionPath); // get the
+																		// lowest
+																		// heading
 				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 				for (int i = 0; i < scoreDoc.length; i++) {
