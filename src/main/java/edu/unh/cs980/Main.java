@@ -1,14 +1,15 @@
 package edu.unh.cs980;
 
 import java.io.FileInputStream;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.Map;
 
 import edu.unh.cs980.Classifier.ClassifyPassageHeadings;
+import edu.unh.cs980.RetrievalModel.BM25;
 import edu.unh.cs980.TopicModel.TopicModelGenerator;
-import unh.edu.cs980.RetrievalModel.BM25;
 import weka.classifiers.Classifier;
 
 public class Main {
