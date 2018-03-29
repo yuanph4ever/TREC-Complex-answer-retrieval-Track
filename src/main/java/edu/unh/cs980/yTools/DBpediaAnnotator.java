@@ -1,4 +1,4 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.yTools;
 
 import java.io.BufferedReader;
 
@@ -32,11 +32,13 @@ public class DBpediaAnnotator {
 	
 	public static void main(String[] args) throws IOException {
 		
+		/*
 		if(args.length < 2) {
 			usage();
 		}
+		*/
 		
-		/* test
+		
 		String input = "Obama was born in 1961 in Honolulu, Hawaii, two years after the territory was admitted to the Union as the 50th state.";
 		String httpUrl = spotlightAPIurl + "text=" + input.replace(" ", "%20");
 		String responseStr = getHttpResponse(httpUrl);
@@ -48,8 +50,9 @@ public class DBpediaAnnotator {
 		    //System.out.println(matcher.group(1).replaceAll("[^A-Za-z0-9]", ""));
 			
 		}
-		*/
 		
+		
+		/*
 		System.setProperty("file.encoding", "UTF-8");
 		
 		final String paragraphsFile = args[0];
@@ -91,6 +94,7 @@ public class DBpediaAnnotator {
 		writer.flush();
 		writer.close();
 		fileInputStream.close();
+		*/
 
 	}	
 

@@ -1,10 +1,10 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.entitiesExpansion;
 
 import edu.unh.cs.treccar_v2.Data;
+
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
-import edu.unh.cs980.peihao.sectionQuery.MyQueryBuilder;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -55,16 +55,22 @@ public class QueryExpansionWithEntities {
 	
 	static String spotlightAPIurl = "http://model.dbpedia-spotlight.org/en/annotate?";
 	
-	public static void main(String[] args) throws IOException{
+	public QueryExpansionWithEntities(String page_file, String index_Dir, String output_Dir) throws IOException{
 		
 		System.setProperty("file.encoding", "UTF-8");
 
+		/*
         if (args.length < 3)
             usage();
 
         final String pagesFile = args[0];
         final String indexPath = args[1];
         final String output = args[2] + "/runfile_query_expansion";
+        */
+		
+		final String pagesFile = page_file;
+        final String indexPath = index_Dir;
+        final String output = output_Dir + "/runfile_query_expansion";
         
         File runfile = new File(output);
 		runfile.createNewFile();
@@ -146,6 +152,36 @@ public class QueryExpansionWithEntities {
 		}
 		return newStr;
 	}
+	
+	//Author: Laura dietz
+			static class MyQueryBuilder {
+
+		        private final StandardAnalyzer analyzer;
+		        private List<String> tokens;
+
+		        public MyQueryBuilder(StandardAnalyzer standardAnalyzer){
+		            analyzer = standardAnalyzer;
+		            tokens = new ArrayList<>(128);
+		        }
+
+		        public BooleanQuery toQuery(String queryStr) throws IOException {
+
+		            TokenStream tokenStream = analyzer.tokenStream("text", new StringReader(queryStr));
+		            tokenStream.reset();
+		            tokens.clear();
+		            while (tokenStream.incrementToken()) {
+		                final String token = tokenStream.getAttribute(CharTermAttribute.class).toString();
+		                tokens.add(token);
+		            }
+		            tokenStream.end();
+		            tokenStream.close();
+		            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+		            for (String token : tokens) {
+		                booleanQuery.add(new TermQuery(new Term("text", token)), BooleanClause.Occur.SHOULD);
+		            }
+		            return booleanQuery.build();
+		        }
+		    }
 	
 	//Author: Laura Dietz
 	private static IndexSearcher setupIndexSearcher(String indexPath, String typeIndex) throws IOException {

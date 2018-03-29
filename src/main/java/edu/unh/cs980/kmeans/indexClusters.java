@@ -1,7 +1,10 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.kmeans;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -23,14 +26,10 @@ import org.apache.lucene.store.FSDirectory;
 import edu.unh.cs.treccar_v2.Data;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 
-/* 
- * This program works for getting index files with term vectors 
- */
-
-public class paraIndexer_v {
+public class indexClusters {
 	
 	private static void usage() {
-        System.out.println("Command line parameters: paragraphCBOR LuceneINDEX");
+        System.out.println("Command line parameters: input_Clusters_Path output_Index_Path");
         System.exit(-1);
     }
 	
@@ -41,34 +40,39 @@ public class paraIndexer_v {
 			
 	        System.setProperty("file.encoding", "UTF-8");
 
-	        String paragraphsFile = args[0];
+	        String clusterPath = args[0];
 	        String indexPath = args[1];
 	        
-	        FileInputStream fileInputStream = new FileInputStream(new File(paragraphsFile));
-
-	        System.out.println("Creating paragraph index in " + indexPath);
+	        File folder = new File(clusterPath);
+	        File[] listOfFiles = folder.listFiles();
 	        
-	        IndexWriter indexWriter = setupIndexWriter(indexPath, "paragraph.lucene.vectors");
+	        System.out.println("Creating cluster index in " + indexPath);
 	        
-	        Iterator<Data.Paragraph> paragraphIterator = DeserializeData.iterParagraphs(fileInputStream);
+	        IndexWriter indexWriter = setupIndexWriter(indexPath, "entites.cluster.lucene.index");
 
-	        for (int i=1; paragraphIterator.hasNext(); i++){
-	        	
-	            Document doc = paragraphToLuceneDoc(paragraphIterator.next());
-	         
-	            indexWriter.addDocument(doc);
-	            if (i % 10000 == 0) {
-	                System.out.println("Index done for " + i + "k paragraphs");
-	                indexWriter.commit();
-	                //break;
+	        int num_of_cluster = 0;
+	        for (File file : listOfFiles) {
+	            if (file.isFile()) {
+	            		/*
+	            		if(file.getName().startsWith("Cluster")) {
+	            			System.out.println("Creating index for " + file.getName());
+	            			Document doc = clusterToLuceneDoc(file, file.getName());
+	            			indexWriter.addDocument(doc);
+	            			num_of_cluster += 1;
+	            		}	
+	            		*/
+	            		System.out.println("Creating index for " + file.getName());
+            			Document doc = clusterToLuceneDoc(file, file.getName());
+            			indexWriter.addDocument(doc);
+            			num_of_cluster += 1;
 	            }
-	            
 	        }
-
-	        System.out.println("\n Done indexing.");
+	        
+	        System.out.println("\nDone indexing for " + num_of_cluster + " clusters.\n");
 
 	        indexWriter.commit();
 	        indexWriter.close();
+
 	    }
 		
 		private static IndexWriter setupIndexWriter(String indexPath, String typeIndex) throws IOException {
@@ -78,18 +82,23 @@ public class paraIndexer_v {
 	        return new IndexWriter(indexDir, config);
 	    }
 		
-		private static Document paragraphToLuceneDoc(Data.Paragraph p) {
-	        final Document doc = new Document();
+		private static Document clusterToLuceneDoc(File file, String cluster_id) throws IOException {
+			final Document doc = new Document();
 	        FieldType type = new FieldType();
 	        type.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
 	        type.setStored(true);
 	        type.setStoreTermVectors(true);
-	        final String content = p.getTextOnly(); // <-- Todo Adapt this to your needs!
-	        //Field field = new Field("body", content, type);
+	        BufferedReader br = new BufferedReader(new FileReader(file));
+	        String line;
+	        String content = "";
+	        while ((line = br.readLine()) != null) {
+	          //System.out.println(line);
+	        	  content += line + " ";
+	        }
 	        doc.add(new StoredField("body", content, type));
 	        doc.add(new TextField("text", content, Field.Store.YES));
-	        doc.add(new StringField("paragraphid", p.getParaId(), Field.Store.YES));  // don't tokenize this!   
+	        doc.add(new StringField("clusterid", cluster_id, Field.Store.YES));  // don't tokenize this!   
 	        return doc;
-	    }
+		}
 
 }

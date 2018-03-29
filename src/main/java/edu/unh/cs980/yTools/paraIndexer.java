@@ -1,4 +1,4 @@
-package edu.unh.cs980.peihao;
+package edu.unh.cs980.yTools;
 
 import edu.unh.cs.treccar_v2.Data;
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
@@ -42,7 +42,7 @@ public class paraIndexer {
          
             indexWriter.addDocument(doc);
             if (i % 10000 == 0) {
-                System.out.println("Index done for " + i + "k paragraphs");
+                System.out.println("Index done for " + i + "paragraphs");
                 indexWriter.commit();
             }
             
