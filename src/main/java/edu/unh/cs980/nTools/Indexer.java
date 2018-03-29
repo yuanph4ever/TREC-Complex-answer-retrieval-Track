@@ -1,4 +1,5 @@
 package edu.unh.cs980.nTools;
+
 import edu.unh.cs.treccar_v2.Data;
 
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
@@ -30,198 +31,210 @@ import java.util.Iterator;
  */
 public class Indexer {
 
-    private static void usage() {
-        System.out.println("Command line parameters: paragraphs paragraphCBOR LuceneINDEX");
-        System.exit(-1);
-    }
+	private static void usage() {
+		System.out.println("Command line parameters: paragraphs paragraphCBOR LuceneINDEX");
+		System.exit(-1);
+	}
 
-    public static void main(String[] args) throws IOException {
-        System.setProperty("file.encoding", "UTF-8");
+	public static void main(String[] args) throws IOException {
+		System.setProperty("file.encoding", "UTF-8");
 
-        if (args.length < 3)
-            usage();
+		if (args.length < 3)
+			usage();
 
-        String mode = args[0];
-        String indexPath = args[2];
+		String mode = args[0];
+		String indexPath = args[2];
 
-        if (mode.equals("paragraphs")) {
-            final String paragraphsFile = args[1];
-            final FileInputStream fileInputStream2 = new FileInputStream(new File(paragraphsFile));
+		if (mode.equals("paragraphs")) {
+			final String paragraphsFile = args[1];
+			final FileInputStream fileInputStream2 = new FileInputStream(new File(paragraphsFile));
 
-            System.out.println("Creating paragraph index in "+indexPath);
-            final IndexWriter indexWriter = setupIndexWriter(indexPath, "paragraph.lucene");
-            final Iterator<Data.Paragraph> paragraphIterator = DeserializeData.iterParagraphs(fileInputStream2);
+			System.out.println("Creating paragraph index in " + indexPath);
+			final IndexWriter indexWriter = setupIndexWriter(indexPath, "paragraph.lucene");
+			final Iterator<Data.Paragraph> paragraphIterator = DeserializeData.iterParagraphs(fileInputStream2);
 
-            for (int i=1; paragraphIterator.hasNext(); i++){
-                final Document doc = paragraphToLuceneDoc(paragraphIterator.next());
-                indexWriter.addDocument(doc);
-                if (i % 100000 == 0) {
-                    System.out.print('.');
-                    indexWriter.commit();
-                }
-            }
+			for (int i = 1; paragraphIterator.hasNext(); i++) {
+				final Document doc = paragraphToLuceneDoc(paragraphIterator.next());
+				indexWriter.addDocument(doc);
+				if (i % 100000 == 0) {
+					System.out.print('.');
+					indexWriter.commit();
+				}
+			}
 
-            System.out.println("\n Done indexing.");
+			System.out.println("\n Done indexing.");
 
-            indexWriter.commit();
-            indexWriter.close();
-        }
-        else if (mode.equals("pages")) {
-            final String pagesFile = args[1];
-            final FileInputStream fileInputStream = new FileInputStream(new File(pagesFile));
+			indexWriter.commit();
+			indexWriter.close();
+		} else if (mode.equals("pages")) {
+			final String pagesFile = args[1];
+			final FileInputStream fileInputStream = new FileInputStream(new File(pagesFile));
 
-            System.out.println("Creating page index in "+indexPath);
-            final IndexWriter indexWriter = setupIndexWriter(indexPath, "pages.lucene");
+			System.out.println("Creating page index in " + indexPath);
+			final IndexWriter indexWriter = setupIndexWriter(indexPath, "pages.lucene");
 
-            final Iterator<Data.Page> pageIterator = DeserializeData.iterAnnotations(fileInputStream);
+			final Iterator<Data.Page> pageIterator = DeserializeData.iterAnnotations(fileInputStream);
 
-            for (int i=1; pageIterator.hasNext(); i++){
-                final Document doc = pageToLuceneDoc(pageIterator.next());
-                
-                indexWriter.addDocument(doc);
-                if (i % 10000 == 0) {
-                    System.out.print('.');
-                    indexWriter.commit();
-                }
-            }
+			for (int i = 1; pageIterator.hasNext(); i++) {
+				final Document doc = pageToLuceneDoc(pageIterator.next());
 
-            System.out.println("\n Done indexing.");
+				indexWriter.addDocument(doc);
+				if (i % 10000 == 0) {
+					System.out.print('.');
+					indexWriter.commit();
+				}
+			}
 
+			System.out.println("\n Done indexing.");
 
-            indexWriter.commit();
-            indexWriter.close();
-        }
-    }
+			indexWriter.commit();
+			indexWriter.close();
+		}
+	}
 
-    private static Iterable<Document> toIterable(final Iterator<Document> iter) throws CborRuntimeException, CborFileTypeException {
-        return new Iterable<Document>() {
-            @Override
-            @NotNull
-            public Iterator<Document> iterator() {
-                return iter;
-            }
-        };
-    }
+	private static Iterable<Document> toIterable(final Iterator<Document> iter)
+			throws CborRuntimeException, CborFileTypeException {
+		return new Iterable<Document>() {
+			@Override
+			@NotNull
+			public Iterator<Document> iterator() {
+				return iter;
+			}
+		};
+	}
 
+	public static class ParaToLuceneIterator implements Iterator<Document> {
+		private static final int DEBUG_EVERY = 10000;
+		private int counter = DEBUG_EVERY;
+		private final Iterator<Data.Paragraph> paragraphIterator;
 
-    public static class ParaToLuceneIterator implements Iterator<Document> {
-        private static final int DEBUG_EVERY = 10000;
-        private int counter = DEBUG_EVERY;
-        private final Iterator<Data.Paragraph> paragraphIterator;
+		ParaToLuceneIterator(Iterator<Data.Paragraph> paragraphIterator) {
+			this.paragraphIterator = paragraphIterator;
+		}
 
-        ParaToLuceneIterator(Iterator<Data.Paragraph> paragraphIterator){
-            this.paragraphIterator = paragraphIterator;
-        }
+		@Override
+		public boolean hasNext() {
+			return this.paragraphIterator.hasNext();
+		}
 
-        @Override
-        public boolean hasNext() {
-            return this.paragraphIterator.hasNext();
-        }
+		@Override
+		public Document next() {
+			counter--;
+			if (counter < 0) {
+				System.out.print('.');
+				counter = DEBUG_EVERY;
+			}
 
-        @Override
-        public Document next() {
-            counter --;
-            if(counter < 0) {
-                System.out.print('.');
-                counter = DEBUG_EVERY;
-            }
+			Data.Paragraph p = this.paragraphIterator.next();
+			return paragraphToLuceneDoc(p);
+		}
 
-            Data.Paragraph p = this.paragraphIterator.next();
-            return paragraphToLuceneDoc(p);
-        }
+		@Override
+		public void remove() {
+			this.paragraphIterator.remove();
+		}
+	}
 
-        @Override
-        public void remove() {
-            this.paragraphIterator.remove();
-        }
-    }
+	@NotNull
+	private static Document paragraphToLuceneDoc(Data.Paragraph p) {
+		final Document doc = new Document();
+		final String content = p.getTextOnly(); // <-- Todo Adapt this to your
+												// needs!
+		doc.add(new TextField("text", content, Field.Store.YES));
+		doc.add(new StringField("paragraphid", p.getParaId(), Field.Store.YES)); // don't
+																					// tokenize
+																					// this!
+		doc.add(new StringField("entities", String.join(" ", p.getEntitiesOnly()), Field.Store.YES));
+		System.out.println(p.getBodies());
+		return doc;
+	}
 
-    @NotNull
-    private static Document paragraphToLuceneDoc(Data.Paragraph p) {
-        final Document doc = new Document();
-        final String content = p.getTextOnly(); // <-- Todo Adapt this to your needs!
-        doc.add(new TextField("text", content, Field.Store.YES));
-        doc.add(new StringField("paragraphid", p.getParaId(), Field.Store.YES));  // don't tokenize this!
-        doc.add(new StringField("entities", String.join(" ", p.getEntitiesOnly()), Field.Store.YES));
-        System.out.println(p.getBodies());
-        return doc;
-    }
+	public static class PageToLuceneIterator implements Iterator<Document> {
+		private static final int DEBUG_EVERY = 1000;
+		private int counter = DEBUG_EVERY;
+		private final Iterator<Data.Page> pageIterator;
 
+		PageToLuceneIterator(Iterator<Data.Page> pageIterator) {
+			this.pageIterator = pageIterator;
+		}
 
-    public static class PageToLuceneIterator implements Iterator<Document> {
-        private static final int DEBUG_EVERY = 1000;
-        private int counter = DEBUG_EVERY;
-        private final Iterator<Data.Page> pageIterator;
+		@Override
+		public boolean hasNext() {
+			return this.pageIterator.hasNext();
+		}
 
-        PageToLuceneIterator(Iterator<Data.Page> pageIterator){
-            this.pageIterator = pageIterator;
-        }
+		@Override
+		public Document next() {
+			counter--;
+			if (counter < 0) {
+				System.out.print('.');
+				counter = DEBUG_EVERY;
+			}
 
-        @Override
-        public boolean hasNext() {
-            return this.pageIterator.hasNext();
-        }
+			Data.Page p = this.pageIterator.next();
+			return pageToLuceneDoc(p);
+		}
 
-        @Override
-        public Document next() {
-            counter --;
-            if(counter < 0) {
-                System.out.print('.');
-                counter = DEBUG_EVERY;
-            }
+		@Override
+		public void remove() {
+			this.pageIterator.remove();
+		}
+	}
 
-            Data.Page p = this.pageIterator.next();
-            return pageToLuceneDoc(p);
-        }
+	@NotNull
+	private static Document pageToLuceneDoc(Data.Page p) {
+		final Document doc = new Document();
+		StringBuilder content = new StringBuilder();
+		pageContent(p, content); // Todo Adapt this to your needs!
 
-        @Override
-        public void remove() {
-            this.pageIterator.remove();
-        }
-    }
+		doc.add(new TextField("text", content.toString(), Field.Store.NO)); // dont
+																			// store,
+																			// just
+																			// index
+		doc.add(new StringField("pageid", p.getPageId(), Field.Store.YES)); // don't
+																			// tokenize
+																			// this!
+		System.out.println(p.getPageName());
+		System.out.println(content);
+		System.out.println(p.getPageMetadata().getCategoryNames());
+		return doc;
+	}
 
-    @NotNull
-    private static Document pageToLuceneDoc(Data.Page p) {
-        final Document doc = new Document();
-        StringBuilder content = new StringBuilder();
-        pageContent(p, content);                    // Todo Adapt this to your needs!
+	private static void sectionContent(Data.Section section, StringBuilder content) {
+		content.append(section.getHeading() + '\n');
+		for (Data.PageSkeleton skel : section.getChildren()) {
+			if (skel instanceof Data.Section)
+				sectionContent((Data.Section) skel, content);
+			else if (skel instanceof Data.Para)
+				paragraphContent((Data.Para) skel, content);
+			else {
+			}
+		}
+	}
 
-        doc.add(new TextField("text",  content.toString(), Field.Store.NO));  // dont store, just index
-        doc.add(new StringField("pageid", p.getPageId(), Field.Store.YES));  // don't tokenize this!
-        System.out.println(p.getPageName());
-        System.out.println(content);
-        System.out.println(p.getPageMetadata().getCategoryNames());
-        return doc;
-    }
+	private static void paragraphContent(Data.Para paragraph, StringBuilder content) {
+		content.append(paragraph.getParagraph().getTextOnly()).append('\n');
+	}
 
+	private static void pageContent(Data.Page page, StringBuilder content) {
+		content.append(page.getPageName()).append('\n');
 
-    private static void sectionContent(Data.Section section, StringBuilder content){
-        content.append(section.getHeading()+'\n');
-        for (Data.PageSkeleton skel: section.getChildren()) {
-            if (skel instanceof Data.Section) sectionContent((Data.Section) skel, content);
-            else if (skel instanceof Data.Para) paragraphContent((Data.Para) skel, content);
-            else {
-            }
-        }
-    }
-    private static void paragraphContent(Data.Para paragraph, StringBuilder content){
-        content.append(paragraph.getParagraph().getTextOnly()).append('\n');
-    }
-    private static void pageContent(Data.Page page, StringBuilder content){
-        content.append(page.getPageName()).append('\n');
+		for (Data.PageSkeleton skel : page.getSkeleton()) {
+			if (skel instanceof Data.Section)
+				sectionContent((Data.Section) skel, content);
+			else if (skel instanceof Data.Para)
+				paragraphContent((Data.Para) skel, content);
+			else {
+			} // ignore other
+		}
 
-        for(Data.PageSkeleton skel: page.getSkeleton()){
-            if(skel instanceof Data.Section) sectionContent((Data.Section) skel, content);
-            else if(skel instanceof Data.Para) paragraphContent((Data.Para) skel, content);
-            else {}    // ignore other
-        }
+	}
 
-    }
-    @NotNull
-    private static IndexWriter setupIndexWriter(String indexPath, String typeIndex) throws IOException {
-        Path path = FileSystems.getDefault().getPath(indexPath, typeIndex);
-        Directory indexDir = FSDirectory.open(path);
-        IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
-        return new IndexWriter(indexDir, config);
-    }
+	@NotNull
+	private static IndexWriter setupIndexWriter(String indexPath, String typeIndex) throws IOException {
+		Path path = FileSystems.getDefault().getPath(indexPath, typeIndex);
+		Directory indexDir = FSDirectory.open(path);
+		IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
+		return new IndexWriter(indexDir, config);
+	}
 }

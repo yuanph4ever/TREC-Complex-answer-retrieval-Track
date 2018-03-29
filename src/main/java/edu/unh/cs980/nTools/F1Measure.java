@@ -39,7 +39,7 @@ public class F1Measure {
 		double relevantEntities = (double) entityRetireved / groundTruth.size();
 		double entitiesRetrievdRelevant = (double) (relevantEntityRetrieved / groundTruth.size());
 
-		double r = entitiesRetrievdRelevant /retrievedEntities;
+		double r = entitiesRetrievdRelevant / retrievedEntities;
 		double p = entitiesRetrievdRelevant / relevantEntities;
 
 		f1Score = (2 * p * r) / (r + p);

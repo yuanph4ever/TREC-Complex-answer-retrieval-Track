@@ -2,7 +2,6 @@ package edu.unh.cs980.nTools;
 
 import java.io.BufferedReader;
 
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -46,8 +45,6 @@ public class DbpediaSpotlightLinker {
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String output;
-
-
 
 			StringBuilder sb = new StringBuilder();
 			while ((output = br.readLine()) != null) {
