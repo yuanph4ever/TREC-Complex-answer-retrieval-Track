@@ -27,8 +27,8 @@ public class HyperLink {
 					if (paraBody instanceof Data.ParaLink) {
 						String entityName = ((Data.ParaLink) paraBody).getPage();
 						String anchorText = ((Data.ParaLink) paraBody).getAnchorText();
-//						System.out.println(entityName + " - - " +anchorText);
-						count ++;
+						// System.out.println(entityName + " - - " +anchorText);
+						count++;
 						if (hyperlinkDictionary.containsKey(entityName)) {
 							List<String> entityAnchorList = hyperlinkDictionary.get(entityName);
 							if (entityAnchorList.contains(anchorText) == false) {
@@ -45,9 +45,8 @@ public class HyperLink {
 				}
 			}
 		}
-		
-		for(Entry<String, List<String>> entry : hyperlinkDictionary.entrySet())
-		{
+
+		for (Entry<String, List<String>> entry : hyperlinkDictionary.entrySet()) {
 			System.out.println(count);
 		}
 
