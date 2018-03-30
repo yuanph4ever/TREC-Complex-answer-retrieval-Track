@@ -30,6 +30,7 @@ public class Main {
 		Map<String, List<String>> pageHeadingMap = bm25.getPageHeadingMap();
 		Map<String, List<String>> sectionHeadingMap = bm25.getSectionHeadingMap();
 		
+		
 //		TopicModelGenerator tmg = new TopicModelGenerator(pageHeadingMap, outputPath+"/trainPageHeading");
 //		
 //		System.out.println("Training Set Generated");

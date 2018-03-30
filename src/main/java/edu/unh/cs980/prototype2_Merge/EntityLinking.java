@@ -2,7 +2,7 @@
 // Variation: DBpedia
 // Corpus : dedup.articles-paragraphs.cbor
 
-package prototype2_Merge;
+package edu.unh.cs980.prototype2_Merge;
 
 
 import java.io.*;

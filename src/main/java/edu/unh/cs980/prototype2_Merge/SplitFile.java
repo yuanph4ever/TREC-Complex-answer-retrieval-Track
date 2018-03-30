@@ -1,4 +1,4 @@
-package prototype2_Merge;
+package edu.unh.cs980.prototype2_Merge;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;

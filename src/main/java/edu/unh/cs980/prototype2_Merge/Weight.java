@@ -1,6 +1,7 @@
-package prototype2_Merge;
+package edu.unh.cs980.prototype2_Merge;
 
 import java.io.BufferedInputStream;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,7 +35,7 @@ import edu.unh.cs.treccar_v2.Data.Page.SectionPathParagraphs;
 import edu.unh.cs.treccar_v2.Data.ParaBody;
 import edu.unh.cs.treccar_v2.Data.Paragraph;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
-import prototype2_Merge.Index.ValueComparator;
+
 
 public class Weight {
 	

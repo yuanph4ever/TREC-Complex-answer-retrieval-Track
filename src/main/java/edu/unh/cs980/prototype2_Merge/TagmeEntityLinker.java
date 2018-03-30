@@ -1,4 +1,4 @@
-package prototype2_Merge;
+package edu.unh.cs980.prototype2_Merge;
 
 
 
@@ -20,7 +20,7 @@ public class TagmeEntityLinker {
 	public ArrayList<String> getEntities(String input) {
 		try {
 
-			String text = "Prior to the German invasion of Norway on 9 April 1940, the Deuxième Bureau (French military intelligence) removed  of heavy water from the plant in Vemork in then-neutral Norway. The plant's managing director, Aubert, agreed to lend the heavy water to France for the duration of the war. The French transported it secretly to Oslo, to Perth, Scotland, and then to France. The plant remained capable of producing heavy water.";
+			String text = "Prior to the German invasion of Norway on 9 April 1940, the Deuxiï¿½me Bureau (French military intelligence) removed  of heavy water from the plant in Vemork in then-neutral Norway. The plant's managing director, Aubert, agreed to lend the heavy water to France for the duration of the war. The French transported it secretly to Oslo, to Perth, Scotland, and then to France. The plant remained capable of producing heavy water.";
 
 			String uri = "https://tagme.d4science.org/tagme/tag" + URLEncoder.encode(text, "UTF-8");
 
