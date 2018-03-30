@@ -2,12 +2,6 @@ package edu.unh.cs980.yTools;
 
 import edu.unh.cs.treccar_v2.Data;
 
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> c03fd4c75cfa5ac4102c114f3863268116f71827
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
@@ -67,7 +61,7 @@ public class pageQuery {
         System.setProperty("file.encoding", "UTF-8");
         
         String flag = args[0];
-<<<<<<< HEAD
+
         /*
         if(flag.equalsIgnoreCase("-hw")) {
         	    System.out.println("Query start...");
@@ -77,7 +71,7 @@ public class pageQuery {
         		HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
         }
         */
-=======
+
         
 //        if(flag.equalsIgnoreCase("-hw")) {
 //        	    System.out.println("Query start...");
@@ -86,7 +80,7 @@ public class pageQuery {
 //            String outputPath = args[2];
 //        		HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
 //        }
->>>>>>> c03fd4c75cfa5ac4102c114f3863268116f71827
+
         
         if (flag == "-cluster") {
             String pagesFile = args[3];

@@ -5,10 +5,7 @@ import edu.unh.cs.treccar_v2.Data;
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
-<<<<<<< HEAD
-=======
 import edu.unh.cs980.yTools.sectionQuery.MyQueryBuilder;
->>>>>>> c03fd4c75cfa5ac4102c114f3863268116f71827
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -59,7 +56,7 @@ public class QueryExpansionWithEntities {
 	
 	static String spotlightAPIurl = "http://model.dbpedia-spotlight.org/en/annotate?";
 	
-	public QueryExpansionWithEntities(String page_file, String index_Dir, String output_Dir) throws IOException{
+	public QueryExpansionWithEntities(String page_file, String index_Dir, String output_Dir, int top) throws IOException{
 		
 		System.setProperty("file.encoding", "UTF-8");
 
@@ -74,13 +71,13 @@ public class QueryExpansionWithEntities {
 		
 		final String pagesFile = page_file;
         final String indexPath = index_Dir;
-        final String output = output_Dir + "/runfile_query_expansion";
+        final String output = output_Dir + "/runfile_query_expansion_" + top;
         
         File runfile = new File(output);
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
 
-		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene");
+		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
         searcher.setSimilarity(new BM25Similarity());
         final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
 
@@ -92,7 +89,7 @@ public class QueryExpansionWithEntities {
             //System.out.println("Initial query: " + queryStr);
             
             //---First Round Query---
-            TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 1);
+            TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), top);
             ScoreDoc[] scoreDoc = tops.scoreDocs;
             String expStr = ""; 
             for (int i = 0; i < scoreDoc.length; i++) {
@@ -128,7 +125,7 @@ public class QueryExpansionWithEntities {
                 final int searchRank = i+1;
 
                 //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
-                System.out.println(".");
+                //System.out.println(".");
                 writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25\n");
                 
             }
@@ -138,7 +135,7 @@ public class QueryExpansionWithEntities {
         writer.flush();//why flush?
 		writer.close();
 		
-		System.out.println("Work Done!");
+		System.out.println("Query Expansion with Top " + top + " Entities Done!");
 		
 	}
 	

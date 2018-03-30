@@ -53,18 +53,19 @@ public class indexClusters {
 	        int num_of_cluster = 0;
 	        for (File file : listOfFiles) {
 	            if (file.isFile()) {
-	            		/*
+	            		
 	            		if(file.getName().startsWith("Cluster")) {
 	            			System.out.println("Creating index for " + file.getName());
 	            			Document doc = clusterToLuceneDoc(file, file.getName());
 	            			indexWriter.addDocument(doc);
 	            			num_of_cluster += 1;
 	            		}	
-	            		*/
+	            		/*
 	            		System.out.println("Creating index for " + file.getName());
             			Document doc = clusterToLuceneDoc(file, file.getName());
             			indexWriter.addDocument(doc);
             			num_of_cluster += 1;
+            			*/
 	            }
 	        }
 	        

@@ -78,10 +78,17 @@ public class QueryByCluster {
 		String flag = type_of_clu;
         String clustersPath = clu_index;
         String outputPath = output_Dir;
+        
+        File runfile;
 		
-    		File runfile = new File(outputPath + "/runfile_page_cluster_kmeans");
-    		runfile.createNewFile();
-    		FileWriter writer = new FileWriter(runfile);		
+        if(flag == "-c") {
+        		runfile = new File(outputPath + "/runfile_page_cluster_types");
+        }else {
+        		runfile = new File(outputPath + "/runfile_page_cluster_kmeans");
+        }
+    		
+        runfile.createNewFile();
+		FileWriter writer = new FileWriter(runfile);		
         
         //paragraphs-run-pages
     		IndexSearcher searcher = setupIndexSearcher(corpusPath, "paragraph.lucene.vectors");
@@ -100,7 +107,7 @@ public class QueryByCluster {
         		//"classifier" use
         		List<String> para_list = new ArrayList<String>();
         	
-        		System.out.println(".");
+        		//System.out.println(".");
         	
             final String queryId = page.getPageId();
 
