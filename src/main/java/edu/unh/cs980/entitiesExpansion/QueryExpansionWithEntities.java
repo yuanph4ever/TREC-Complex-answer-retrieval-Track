@@ -5,6 +5,10 @@ import edu.unh.cs.treccar_v2.Data;
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
+<<<<<<< HEAD
+=======
+import edu.unh.cs980.yTools.sectionQuery.MyQueryBuilder;
+>>>>>>> c03fd4c75cfa5ac4102c114f3863268116f71827
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;

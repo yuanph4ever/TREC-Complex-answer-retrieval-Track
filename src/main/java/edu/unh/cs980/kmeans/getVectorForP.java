@@ -2,7 +2,10 @@ package edu.unh.cs980.kmeans;
 
 import java.io.BufferedReader;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c03fd4c75cfa5ac4102c114f3863268116f71827
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +48,12 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 
 import edu.unh.cs.treccar_v2.Data;
+<<<<<<< HEAD
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;	
+=======
+import edu.unh.cs.treccar_v2.read_data.DeserializeData;
+import edu.unh.cs980.yTools.sectionQuery.MyQueryBuilder;
+>>>>>>> c03fd4c75cfa5ac4102c114f3863268116f71827
 
 public class getVectorForP {
 	

@@ -116,7 +116,7 @@ public class sectionQuery {
 	}
 	
 	//Author: Laura dietz
-		static class MyQueryBuilder {
+		public static class MyQueryBuilder {
 
 	        private final StandardAnalyzer analyzer;
 	        private List<String> tokens;

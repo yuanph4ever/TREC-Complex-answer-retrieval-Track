@@ -1,4 +1,8 @@
+<<<<<<< HEAD:src/main/java/edu/unh/cs980/yTools/nameDicMaker.java
 package edu.unh.cs980.yTools;
+=======
+package edu.unh.cs980.kmeans;
+>>>>>>> c03fd4c75cfa5ac4102c114f3863268116f71827:src/main/java/edu/unh/cs980/kmeans/nameDicMaker.java
 
 import java.io.File;
 import java.io.FileInputStream;

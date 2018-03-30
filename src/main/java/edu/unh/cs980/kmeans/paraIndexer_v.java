@@ -1,4 +1,8 @@
+<<<<<<< HEAD:src/main/java/edu/unh/cs980/kmeans/paraIndexer_v.java
 package edu.unh.cs980.kmeans;
+=======
+package edu.unh.cs980.yTools;
+>>>>>>> c03fd4c75cfa5ac4102c114f3863268116f71827:src/main/java/edu/unh/cs980/yTools/paraIndexer_v.java
 
 import java.io.File;
 import java.io.FileInputStream;
