@@ -42,7 +42,7 @@ public class paraIndexer {
          
             indexWriter.addDocument(doc);
             if (i % 10000 == 0) {
-                System.out.println("Index done for " + i + "k paragraphs");
+                System.out.println("Index done for " + i + "paragraphs");
                 indexWriter.commit();
             }
             

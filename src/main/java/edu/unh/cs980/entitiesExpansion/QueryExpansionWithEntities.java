@@ -56,22 +56,28 @@ public class QueryExpansionWithEntities {
 	
 	static String spotlightAPIurl = "http://model.dbpedia-spotlight.org/en/annotate?";
 	
-	public static void main(String[] args) throws IOException{
+	public QueryExpansionWithEntities(String page_file, String index_Dir, String output_Dir, int top) throws IOException{
 		
 		System.setProperty("file.encoding", "UTF-8");
 
+		/*
         if (args.length < 3)
             usage();
 
         final String pagesFile = args[0];
         final String indexPath = args[1];
         final String output = args[2] + "/runfile_query_expansion";
+        */
+		
+		final String pagesFile = page_file;
+        final String indexPath = index_Dir;
+        final String output = output_Dir + "/runfile_query_expansion_" + top;
         
         File runfile = new File(output);
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
 
-		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene");
+		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
         searcher.setSimilarity(new BM25Similarity());
         final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
 
@@ -83,7 +89,7 @@ public class QueryExpansionWithEntities {
             //System.out.println("Initial query: " + queryStr);
             
             //---First Round Query---
-            TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 1);
+            TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), top);
             ScoreDoc[] scoreDoc = tops.scoreDocs;
             String expStr = ""; 
             for (int i = 0; i < scoreDoc.length; i++) {
@@ -119,7 +125,7 @@ public class QueryExpansionWithEntities {
                 final int searchRank = i+1;
 
                 //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
-                System.out.println(".");
+                //System.out.println(".");
                 writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25\n");
                 
             }
@@ -129,7 +135,7 @@ public class QueryExpansionWithEntities {
         writer.flush();//why flush?
 		writer.close();
 		
-		System.out.println("Work Done!");
+		System.out.println("Query Expansion with Top " + top + " Entities Done!");
 		
 	}
 	
@@ -147,6 +153,36 @@ public class QueryExpansionWithEntities {
 		}
 		return newStr;
 	}
+	
+	//Author: Laura dietz
+			static class MyQueryBuilder {
+
+		        private final StandardAnalyzer analyzer;
+		        private List<String> tokens;
+
+		        public MyQueryBuilder(StandardAnalyzer standardAnalyzer){
+		            analyzer = standardAnalyzer;
+		            tokens = new ArrayList<>(128);
+		        }
+
+		        public BooleanQuery toQuery(String queryStr) throws IOException {
+
+		            TokenStream tokenStream = analyzer.tokenStream("text", new StringReader(queryStr));
+		            tokenStream.reset();
+		            tokens.clear();
+		            while (tokenStream.incrementToken()) {
+		                final String token = tokenStream.getAttribute(CharTermAttribute.class).toString();
+		                tokens.add(token);
+		            }
+		            tokenStream.end();
+		            tokenStream.close();
+		            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+		            for (String token : tokens) {
+		                booleanQuery.add(new TermQuery(new Term("text", token)), BooleanClause.Occur.SHOULD);
+		            }
+		            return booleanQuery.build();
+		        }
+		    }
 	
 	//Author: Laura Dietz
 	private static IndexSearcher setupIndexSearcher(String indexPath, String typeIndex) throws IOException {

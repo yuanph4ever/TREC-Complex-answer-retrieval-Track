@@ -2,9 +2,6 @@ package edu.unh.cs980.yTools;
 
 import edu.unh.cs.treccar_v2.Data;
 
-
-
-
 import edu.unh.cs.treccar_v2.read_data.CborFileTypeException;
 import edu.unh.cs.treccar_v2.read_data.CborRuntimeException;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
@@ -64,6 +61,17 @@ public class pageQuery {
         System.setProperty("file.encoding", "UTF-8");
         
         String flag = args[0];
+
+        /*
+        if(flag.equalsIgnoreCase("-hw")) {
+        	    System.out.println("Query start...");
+            String pagesFile = args[3];
+            String indexPath = args[1];
+            String outputPath = args[2];
+        		HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
+        }
+        */
+
         
 //        if(flag.equalsIgnoreCase("-hw")) {
 //        	    System.out.println("Query start...");
@@ -72,6 +80,7 @@ public class pageQuery {
 //            String outputPath = args[2];
 //        		HeadingWeights hW = new HeadingWeights(pagesFile, indexPath, outputPath);
 //        }
+
         
         if (flag == "-cluster") {
             String pagesFile = args[3];
@@ -183,12 +192,14 @@ public class pageQuery {
              
         }
         
+        /*
         if(flag.equalsIgnoreCase("-v")) {
         	    System.out.println("Start getting vector for paragraph");
         	    String indexPath = args[1];
             String outputPath = args[2];
         		getVforP v = new getVforP(indexPath, outputPath);
         }
+        */
         
         if(flag == "r+") {
         	    String indexPath = args[1];

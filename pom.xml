@@ -29,7 +29,7 @@
 						<configuration>
 							<archive>
 								<manifest>
-									<mainClass>edu.unh.cs980.HeadingWeights</mainClass>
+									<mainClass>edu.unh.cs980.Main</mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>

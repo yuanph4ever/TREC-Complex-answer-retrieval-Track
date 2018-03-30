@@ -1,7 +1,6 @@
 package edu.unh.cs980.kmeans;
 
 import java.io.BufferedReader;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +43,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 
 import edu.unh.cs.treccar_v2.Data;
+import edu.unh.cs.treccar_v2.read_data.DeserializeData;	
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 import edu.unh.cs980.yTools.sectionQuery.MyQueryBuilder;
 
@@ -56,7 +56,7 @@ public static void main(String[] args) throws IOException {
         String indexPath = args[0];
         String outputPath = args[1];
         
-        File runfile = new File(outputPath + "/para_vectors_10000");
+        File runfile = new File(outputPath + "/para_vectors_tfidf_10000");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
 		
@@ -89,7 +89,7 @@ public static void main(String[] args) throws IOException {
         				//System.out.println("doc fre: " + termsEnum.docFreq());
         				//System.out.println("term fre: " + termsEnum.totalTermFreq());                    
         				
-        				writer.write("--->" + term.utf8ToString() + ":" + termsEnum.totalTermFreq());
+        				writer.write("--->" + term.utf8ToString() + ":" + termsEnum.totalTermFreq()/termsEnum.docFreq() );
         				
         			}
         			      			
@@ -99,8 +99,9 @@ public static void main(String[] args) throws IOException {
         		}
         		
         		writer.write("\n");
+        		System.out.println(".");
         		
-        	        	
+        	
         }
         
         writer.flush();
@@ -109,5 +110,6 @@ public static void main(String[] args) throws IOException {
 		System.out.println("Number of non terms doc: " + count);
         System.out.println("Number of doc: " + reader.maxDoc());       
 	}
+
 	
 }
