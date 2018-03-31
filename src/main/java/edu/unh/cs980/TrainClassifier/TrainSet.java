@@ -3,12 +3,14 @@ package edu.unh.cs980.TrainClassifier;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +36,8 @@ import cc.mallet.pipe.TokenSequenceRemoveStopwords;
 import cc.mallet.pipe.iterator.ArrayIterator;
 import cc.mallet.pipe.iterator.StringArrayIterator;
 import cc.mallet.types.InstanceList;
+import edu.unh.cs.treccar_v2.Data;
+import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -48,31 +52,57 @@ public class TrainSet implements Serializable {
 	private FastVector attributes;
 	ArrayList<String> listOfParagraphs = new ArrayList<String>();
 
-	public TrainSet(Map<String, String> passageHeadings, String outputPath) throws IOException {
-		this(passageHeadings.size());
-		for (Entry<String, String> entry : passageHeadings.entrySet()) {
-			addHeading(entry.getKey());
-			
-		}
-		setupAfterHeadingAdded();
+	public TrainSet(String paraFile, String outputPath) throws IOException {
+		this();
+		final String paragraphsFile = paraFile;
+		final FileInputStream fileInputStream2 = new FileInputStream(new File(paragraphsFile));
+		final Iterator<Data.Paragraph> paragraphIterator = DeserializeData.iterParagraphs(fileInputStream2);
+		System.out.println("Adding class values to the trainset......\n");
+		for (int i = 1; paragraphIterator.hasNext(); i++) {
 
-		for (Entry<String, String> entry : passageHeadings.entrySet()) {
-			
-				addParagrah(entry.getValue(), entry.getKey());
+			String para = paragraphIterator.next().getTextOnly();
+			String paraId = paragraphIterator.next().getParaId();
+			if (i % 100000 == 0) {
+				System.out.print(".");
+				addHeading(paraId);
+
+				break;
+			}
+
 		}
+
+		System.out.println("Done adding heading");
+		setupAfterHeadingAdded();
+		System.out.println("Now Adding para and class values to the trainset......\n");
+		final FileInputStream fileInputStream3 = new FileInputStream(new File(paragraphsFile));
+		final Iterator<Data.Paragraph> paragraphIterator2 = DeserializeData.iterParagraphs(fileInputStream3);
+		for (int i = 1; paragraphIterator2.hasNext(); i++) {
+
+			String para = paragraphIterator2.next().getTextOnly();
+			String paraId = paragraphIterator2.next().getParaId();
+
+			if (i % 100000 == 0) {
+				System.out.print(".");
+				addParagrah(para, paraId);
+				break;
+			}
+
+		}
+
+		System.out.println("Done adding para and class file");
 
 		createDatasetFile(outputPath);
 		// buildPipe();
 	}
 
-	public TrainSet(int classSize) {
+	public TrainSet() {
 
 		// Create vector of attributes.
 		this.attributes = new FastVector(2);
 		// Add attribute for holding texts.
 		this.attributes.addElement(new Attribute("text", (FastVector) null));
 		// Add class attribute.
-		this.classValues = new FastVector(classSize);
+		this.classValues = new FastVector(3);
 
 	}
 
@@ -87,7 +117,7 @@ public class TrainSet implements Serializable {
 
 	public void addParagrah(String paragraph, String classValue) throws IllegalStateException {
 		paragraph = paragraph.toLowerCase();
-		classValue = classValue.toLowerCase();
+
 		// Make message into instance.
 		Instance instance = makeInstance(paragraph, trainingData);
 		// Set class value for instance.

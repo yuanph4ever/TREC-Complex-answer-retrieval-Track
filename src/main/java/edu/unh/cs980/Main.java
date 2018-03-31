@@ -12,6 +12,7 @@ import edu.unh.cs980.RetrievalModel.BM25;
 import edu.unh.cs980.TopicModel.CreateArrfDataset;
 import edu.unh.cs980.TopicModel.CreateTestSet;
 import edu.unh.cs980.TopicModel.TopicModelGenerator;
+import edu.unh.cs980.TrainClassifier.TrainSet;
 import edu.unh.cs980.entitiesExpansion.QueryExpansionWithEntities;
 import edu.unh.cs980.kmeans.QueryByCluster;
 import weka.classifiers.Classifier;
@@ -30,9 +31,10 @@ public class Main {
 		
 		System.setProperty("file.encoding", "UTF-8");
 
-		String pagesFile = args[0];
-		String indexPath = args[1];
-		String outputPath = args[2];
+//		String pagesFile = args[0];
+//		String indexPath = args[1];
+		String outputPath = args[0];
+		String trainpath = args[1];
 		
 		// Peihao
 //		String kmeans_clu_index = args[3];
@@ -92,18 +94,16 @@ public class Main {
 		
 //		CreateTestSet cts = new CreateTestSet(pageHeadingMap, outputPath+"testArrff");
 		
-		String trainfilepath = "/Users/Nithin/Desktop/train/base.train.cbor-paragraphs.cbor";
+		//String trainfilepath = "/Users/Nithin/Desktop/train/base.train.cbor-paragraphs.cbor";
 		HeadingContentExtractor hce = new HeadingContentExtractor();
 		
-		Map<String, String> paragraphsHeadingsFromTrainv2 = hce.mapParaHeading(trainfilepath);
+		//Map<String, String> paragraphsHeadingsFromTrainv2 = hce.mapParaHeading(trainfilepath);
 		
 		//TopicModelGenerator tmg = new TopicModelGenerator(paragraphsHeadingsFromTrainv2, outputPath+"/trainPageHeading");
 		
+		TrainSet ts = new TrainSet(trainpath, outputPath +"v2.0set");
 		
-		
-		
-		
-		
+
 
 	}
 
