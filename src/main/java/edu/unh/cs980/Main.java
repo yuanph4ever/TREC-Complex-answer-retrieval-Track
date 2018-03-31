@@ -43,7 +43,6 @@ public class Main {
 		/*
 		 * Query Expansion with entities, use top 1, 2, 3, 4, 5
 		 */
-		
 		System.out.println("Start Query Expansion with Entities");
 		for(int i = 1; i < 6; i ++) {
 			QueryExpansionWithEntities qewe = new QueryExpansionWithEntities(pagesFile, indexPath, outputPath, i);

@@ -269,7 +269,7 @@ public class QueryByCluster {
 				}
 			}
 			if(p != 0){
-				s = 1/p;
+				s = 10/p;
 			}
 		}
 		return s + score;
