@@ -2,7 +2,7 @@
 
 # Installation Instruction
 
-# a. Working on your loptop:
+# a. Working on your laptop:
 
 1.Clone this repository
 
