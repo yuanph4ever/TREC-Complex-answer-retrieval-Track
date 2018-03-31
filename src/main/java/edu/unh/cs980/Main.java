@@ -59,13 +59,25 @@ public class Main {
 		System.out.println("Query by K-means Cluster DONE");
 		
 		/*
+		Map<String, List<String>> map_qid_ptext = qbk.getModel();
+		
+		int count = 0;
+		for (Map.Entry<String,List<String>> entry : map_qid_ptext.entrySet()) {
+			System.out.println("Key = " + entry.getKey());
+			System.out.println("Value = " + entry.getValue());
+			count ++;
+		}
+            
+		System.out.println("number of query is " + count);
+		*/
+		
+		/*
 		 * Query by using types clusters
 		 */
 		System.out.println("Start Query by Types Cluster");
 		QueryByCluster qbc = new QueryByCluster(pagesFile, indexPath, "-c", types_clu_index, outputPath);
 		num_of_runfile ++;
 		System.out.println("Query by Types Cluster DONE");
-		
 		
 		// Start searching for the passages
 //		BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);

@@ -138,7 +138,7 @@ public class QueryBM25 {
         	
         		
         	
-        		final String output = args[3] + "/runfile_para_pages";
+        		final String output = args[3] + "/runfile_para_pages_test";
             
             File runfile = new File(output);
     			runfile.createNewFile();

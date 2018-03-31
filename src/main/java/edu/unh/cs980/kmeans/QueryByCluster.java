@@ -144,6 +144,7 @@ public class QueryByCluster {
                         //System.out.println(i);
                         runfile_map.put(paragraphid, newScore);
                 }
+            		//System.out.println(para_map);
             		runfile_map = sortByComparator(runfile_map, false);
             		//printMap(runfile_map);
             		int searchRank = 0;
@@ -154,29 +155,28 @@ public class QueryByCluster {
           			  //System.out.println("key is " + key + "; value is " + value);
           			  writer.write(queryId + " Q0 " + key + " " + searchRank + " " + value + " Lucene-BM25\n");  
           			  //for "classifier" use
-          			  String para_content = para_map.get(value);
+          			  String para_content = para_map.get(key);
+          			  //System.out.println("para content is " + para_content);
           			  para_list.add(para_content);
           		}
+            		//System.out.println("tag 1 : " + para_list);
             		num_of_reRank ++;
             }else {
             	    //without re_rank
             		for (int i = 0; i < scoreDoc.length; i++) {
-            			//map para_id to para_content for "classifier" use
-                		Map<String, String> para_map = new HashMap<String, String>();
                     ScoreDoc score = scoreDoc[i];
                     final Document doc = searcher.doc(score.doc); // to access stored content
                     final String paragraphid = doc.getField("paragraphid").stringValue();
                     final String para_text = doc.getField("text").stringValue();
-                    para_map.put(paragraphid, para_text);
                     final float searchScore = score.score;
                     final int searchRank = i+1;
                     //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
                     //System.out.println(".");
                     writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
                     //for "classifier" use
-                    String para_content = para_map.get(paragraphid);
-        			  	para_list.add(para_content);
+    			  		para_list.add(para_text);
             		}
+            		//System.out.println("tag 2 : " + para_list);
             	
             }
             
