@@ -14,11 +14,12 @@ import weka.filters.unsupervised.instance.Resample;
 
 public class RFClassifier {
 
-	public RandomForest trainclassifier(String arrfFile) throws Exception {
-
+	public RandomForest trainclassifier(String arrfFile, String modelPath) throws Exception {
+		
+		 System.out.println("Training RF classifier with the trainset"); 
 		int seed = 1;
 		int folds = 10;
-		DataSource trainSource = new DataSource(arrfFile + ".arff");
+		DataSource trainSource = new DataSource(arrfFile);
 		Instances trainingSet = trainSource.getDataSet();
 		if (trainingSet.classIndex() == -1)
 			trainingSet.setClassIndex(trainingSet.numAttributes() - 1);
@@ -42,10 +43,10 @@ public class RFClassifier {
 		
 		trainingSet = Filter.useFilter(trainingSet, filter);
 
-		Random rand = new Random(seed);
-		trainingSet.randomize(rand);
-		if (trainingSet.classAttribute().isNominal())
-			trainingSet.stratify(folds);
+//		Random rand = new Random(seed);
+//		trainingSet.randomize(rand);
+//		if (trainingSet.classAttribute().isNominal())
+//			trainingSet.stratify(folds);
 
 		RandomForest classifier = new RandomForest();
 
@@ -60,7 +61,7 @@ public class RFClassifier {
 		System.out.println(eval.toClassDetailsString() + "\n" + eval.toMatrixString() + "\n");
 		classifier.buildClassifier(trainingSet);
 		
-		weka.core.SerializationHelper.write("/Users/Nithin/git/TREC-Complex-answer-retrieval-Track/trainedModel/RF_Page.model", classifier);
+		weka.core.SerializationHelper.write(modelPath +"/trainedModel/RF_Page.model", classifier);
 
 		
 		return classifier;

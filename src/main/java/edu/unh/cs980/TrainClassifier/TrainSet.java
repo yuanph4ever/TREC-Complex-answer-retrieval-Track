@@ -37,6 +37,7 @@ import cc.mallet.pipe.iterator.ArrayIterator;
 import cc.mallet.pipe.iterator.StringArrayIterator;
 import cc.mallet.types.InstanceList;
 import edu.unh.cs.treccar_v2.Data;
+import edu.unh.cs.treccar_v2.Data.Paragraph;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
@@ -44,6 +45,10 @@ import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.unsupervised.attribute.StringToWordVector;
+
+// Responsible for making the train Set
+// Each paragraph and the paragraph id are given 
+// to the classifier and trained
 
 public class TrainSet implements Serializable {
 
@@ -60,32 +65,29 @@ public class TrainSet implements Serializable {
 		System.out.println("Adding class values to the trainset......\n");
 		for (int i = 1; paragraphIterator.hasNext(); i++) {
 
-			String para = paragraphIterator.next().getTextOnly();
-			String paraId = paragraphIterator.next().getParaId();
-			if (i % 100000 == 0) {
-				System.out.print(".");
-				addHeading(paraId);
+			headingAdd(paragraphIterator.next());
+			System.out.print(".");
 
+			if (i == 10000)
 				break;
-			}
 
 		}
 
 		System.out.println("Done adding heading");
+
 		setupAfterHeadingAdded();
+
 		System.out.println("Now Adding para and class values to the trainset......\n");
+
 		final FileInputStream fileInputStream3 = new FileInputStream(new File(paragraphsFile));
 		final Iterator<Data.Paragraph> paragraphIterator2 = DeserializeData.iterParagraphs(fileInputStream3);
 		for (int i = 1; paragraphIterator2.hasNext(); i++) {
 
-			String para = paragraphIterator2.next().getTextOnly();
-			String paraId = paragraphIterator2.next().getParaId();
+			paragraphAdd(paragraphIterator2.next());
+			System.out.print(".");
 
-			if (i % 100000 == 0) {
-				System.out.print(".");
-				addParagrah(para, paraId);
+			if (i == 10000)
 				break;
-			}
 
 		}
 
@@ -95,6 +97,19 @@ public class TrainSet implements Serializable {
 		// buildPipe();
 	}
 
+	private void headingAdd(Data.Paragraph p) {
+		final String paraId = p.getParaId();
+		addHeading(paraId);
+	}
+
+	private void paragraphAdd(Data.Paragraph p) {
+		final String paraId = p.getParaId();
+		final String para = p.getTextOnly();
+
+		addParagrah(para, paraId);
+
+	}
+
 	public TrainSet() {
 
 		// Create vector of attributes.
@@ -102,7 +117,7 @@ public class TrainSet implements Serializable {
 		// Add attribute for holding texts.
 		this.attributes.addElement(new Attribute("text", (FastVector) null));
 		// Add class attribute.
-		this.classValues = new FastVector(3);
+		this.classValues = new FastVector();
 
 	}
 

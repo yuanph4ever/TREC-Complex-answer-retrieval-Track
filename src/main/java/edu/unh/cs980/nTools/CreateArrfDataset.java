@@ -1,4 +1,4 @@
-package edu.unh.cs980.TopicModel;
+package edu.unh.cs980.nTools;
 
 import java.io.BufferedWriter;
 import java.io.File;

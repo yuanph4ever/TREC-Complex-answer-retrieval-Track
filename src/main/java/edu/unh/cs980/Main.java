@@ -9,8 +9,6 @@ import java.util.Map;
 import edu.unh.cs980.Classifier.ClassifyPassageHeadings;
 import edu.unh.cs980.ExtractLabels.HeadingContentExtractor;
 import edu.unh.cs980.RetrievalModel.BM25;
-import edu.unh.cs980.TopicModel.CreateArrfDataset;
-import edu.unh.cs980.TopicModel.CreateTestSet;
 import edu.unh.cs980.TopicModel.TopicModelGenerator;
 import edu.unh.cs980.TrainClassifier.TrainSet;
 import edu.unh.cs980.entitiesExpansion.QueryExpansionWithEntities;
@@ -33,8 +31,11 @@ public class Main {
 
 //		String pagesFile = args[0];
 //		String indexPath = args[1];
-		String outputPath = args[0];
-		String trainpath = args[1];
+//		String outputPath = args[0];
+		
+		String modelPath = args[0];
+		String trainSet = args[1];
+	
 		
 		// Peihao
 //		String kmeans_clu_index = args[3];
@@ -95,16 +96,16 @@ public class Main {
 //		CreateTestSet cts = new CreateTestSet(pageHeadingMap, outputPath+"testArrff");
 		
 		//String trainfilepath = "/Users/Nithin/Desktop/train/base.train.cbor-paragraphs.cbor";
-		HeadingContentExtractor hce = new HeadingContentExtractor();
+//		HeadingContentExtractor hce = new HeadingContentExtractor();
 		
 		//Map<String, String> paragraphsHeadingsFromTrainv2 = hce.mapParaHeading(trainfilepath);
 		
 		//TopicModelGenerator tmg = new TopicModelGenerator(paragraphsHeadingsFromTrainv2, outputPath+"/trainPageHeading");
 		
-		TrainSet ts = new TrainSet(trainpath, outputPath +"v2.0set");
+		//TrainSet ts = new TrainSet(trainpath, outputPath +"v2.0set");
 		
-
-
+		//Classifier cls = (Classifier) weka.core.SerializationHelper.read("/Users/Nithin/git/TREC-Complex-answer-retrieval-Track/trainedModel/RF_Page.model");
+		ClassifyPassageHeadings cpf =  new ClassifyPassageHeadings(trainSet, modelPath);
 	}
 
 }
