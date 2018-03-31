@@ -60,7 +60,7 @@ public class Main {
 		System.out.println("Query by K-means Cluster DONE");
 
 		// Nithin
-
+		//
 		// String modelPath = args[0];
 		// String trainSet = args[1];
 		// String trainPath = args[2];
