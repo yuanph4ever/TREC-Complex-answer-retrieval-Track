@@ -21,7 +21,7 @@ public class J48Classifier{
   //load dataset
 	  
 	  
-  DataSource source = new DataSource(trainSet);
+  DataSource source = new DataSource("/Users/Nithin/Desktop/Runfile/trainPageHeading.arff");
   Instances dataset = source.getDataSet();
   System.out.println("loaded dataSet");
   //set class index to the last attribute

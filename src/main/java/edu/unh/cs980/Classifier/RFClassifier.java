@@ -9,14 +9,16 @@ import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.core.stemmers.LovinsStemmer;
 import weka.filters.Filter;
+import weka.filters.MultiFilter;
+import weka.filters.unsupervised.attribute.StringToNominal;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 import weka.filters.unsupervised.instance.Resample;
 
 public class RFClassifier {
 
 	public RandomForest trainclassifier(String arrfFile, String modelPath) throws Exception {
-		
-		 System.out.println("Training RF classifier with the trainset"); 
+
+		System.out.println("Training RF classifier with the trainset");
 		int seed = 1;
 		int folds = 10;
 		DataSource trainSource = new DataSource(arrfFile);
@@ -30,23 +32,26 @@ public class RFClassifier {
 
 		trainingSet = Filter.useFilter(trainingSet, reSample);
 
-		StringToWordVector filter = new StringToWordVector();
-		filter.setInputFormat(trainingSet);
-		filter.setIDFTransform(true);
-		filter.setUseStoplist(true);
-		System.out.println("Filter applied - StringtoWord");
-		LovinsStemmer stemmer = new LovinsStemmer();
-		filter.setStemmer(stemmer);
-		filter.setLowerCaseTokens(true);
-		System.out.println("Stemmer done");
-		
-		
-		trainingSet = Filter.useFilter(trainingSet, filter);
+//		StringToWordVector filter = new StringToWordVector();
+//		filter.setInputFormat(trainingSet);
+//		filter.setIDFTransform(true);
+//		filter.setUseStoplist(true);
+//		System.out.println("Filter applied - StringtoWord");
+//		LovinsStemmer stemmer = new LovinsStemmer();
+//		filter.setStemmer(stemmer);
+//		filter.setLowerCaseTokens(true);
+//		System.out.println("Stemmer done");
+//
+//		// StringToNominal stnfilter = new StringToNominal();
+//		// stnfilter.setInputFormat(trainingSet);
+//
+//		trainingSet = Filter.useFilter(trainingSet, filter);
 
-//		Random rand = new Random(seed);
-//		trainingSet.randomize(rand);
-//		if (trainingSet.classAttribute().isNominal())
-//			trainingSet.stratify(folds);
+		Random rand = new Random(seed);
+		trainingSet.randomize(rand);
+		if (trainingSet.classAttribute().isNominal())
+			trainingSet.stratify(folds);
+		System.out.println("Applying  filter");
 
 		RandomForest classifier = new RandomForest();
 
@@ -60,10 +65,9 @@ public class RFClassifier {
 		System.out.println(eval.toSummaryString("=== " + folds + "-fold Cross-validation ===\n", false));
 		System.out.println(eval.toClassDetailsString() + "\n" + eval.toMatrixString() + "\n");
 		classifier.buildClassifier(trainingSet);
-		
-		weka.core.SerializationHelper.write(modelPath +"/trainedModel/RF_Page.model", classifier);
 
-		
+		weka.core.SerializationHelper.write(modelPath + "/trainedModel/RF_Page.model", classifier);
+
 		return classifier;
 
 	}
