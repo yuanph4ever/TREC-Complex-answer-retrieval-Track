@@ -40,6 +40,17 @@ All files you need are set up on the server. You just need to change the argumen
 
 # Re-rank by Category Clustering
 
+Part 1:
+
+The indexing for this method involved sequential execution of these four methods:
+
+1)	EntityLinking.java
+2)	CurlProcess.java
+3)	Split.java
+4)	Index.java
+
+The output file location : ****Peihao, Please provide path of the output file**** 
+
 # Re-rank by DBpedia Type
 
 Program: Readnprocess.java
