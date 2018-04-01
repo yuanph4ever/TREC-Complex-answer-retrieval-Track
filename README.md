@@ -43,7 +43,9 @@ All files you need are set up on the server. You just need to change the argumen
 # Re-rank by DBpedia Type
 
 Program: Readnprocess.java
+
 Input: Run file with BM25 similarity
+
 Location: : ******provide location for the baseline page test set (top 20)***********
 
 Pre requisite:  1) The Dbpedia spotlight server is listening
@@ -64,7 +66,9 @@ Location: ******provide location for the runfile(Rerank_by_type.txt)  that I sen
 # Re-Rank by DBpedia Type and BM25 similarity with weight
 
 Program: Weight.java
+
 Input: Run file with BM25 similarity
+
 Location: : ******provide location for the baseline page test set (top 20)***********
 
 Pre requisite:  1) The Dbpedia spotlight server is listening
