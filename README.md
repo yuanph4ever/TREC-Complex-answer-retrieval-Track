@@ -40,4 +40,44 @@ All files you need are set up on the server. You just need to change the argumen
 
 # Re-rank by Category Clustering
 
+# Re-rank by DBpedia Type
+
+Program: Readnprocess.java
+Input: Run file with BM25 similarity
+Location: : ******provide location for the baseline page test set (top 20)***********
+
+Pre requisite:  1) The Dbpedia spotlight server is listening
+	           2) pom file
+                       3) dedup.articles-paragraphs.cbor
+	           Location : ******provide location for the dedup***********
+
+
+Execution procedure:
+1)	Start the DBpedia server
+2)	Execute the file by changing the path for input, output and dedup.articles-paragraphs.cbor
+
+The runtime of this run file is around 10 minutes. I have provided the run file of this method for test.pages.cbor-outlines.cbor. 
+
+Location: ******provide location for the runfile(Rerank_by_type.txt)  that I sent you***********
+
+
+# Re-Rank by DBpedia Type and BM25 similarity with weight
+
+Program: Weight.java
+Input: Run file with BM25 similarity
+Location: : ******provide location for the baseline page test set (top 20)***********
+
+Pre requisite:  1) The Dbpedia spotlight server is listening
+	           2) pom file
+                       3) dedup.articles-paragraphs.cbor
+	           Location : ******provide location for the dedup***********
+
+
+Execution procedure:
+1)	Start the DBpedia server
+2)	Execute the file by changing the path for input, output and dedup.articles-paragraphs.cbor
+
+The runtime of this run file is around 12-15 minutes. I have provided the run file of this method for test.pages.cbor-outlines.cbor. 
+
+Location: ***provide location for the runfile(Rerank _by_weigth.txt) that I sent you****
 
