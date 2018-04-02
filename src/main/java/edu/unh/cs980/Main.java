@@ -18,45 +18,54 @@ import weka.classifiers.Classifier;
 public class Main {
 	
 	private static void usage() {
-        System.out.println("Command line parameters: Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir");
+        System.out.println("Command line parameters:Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir");
         System.exit(-1);
     }
 
 	public static void main(String[] args) throws Exception {
 		
-		if (args.length < 5)
+		if (args.length < 6)
             usage();
 		
 		System.setProperty("file.encoding", "UTF-8");
-
-		String pagesFile = args[0];
-		String indexPath = args[1];
-		String outputPath = args[2];
 		
-		String kmeans_clu_index = args[3];
-		String types_clu_index = args[4];
+		String method_signal = args[0];
+
+		String pagesFile = args[1];
+		String indexPath = args[2];
+		String outputPath = args[3];
+		
+		String kmeans_clu_index = args[4];
+		String types_clu_index = args[5];
 		
 		int num_of_runfile = 0;
+		
+		System.out.println("Get method signal: " + method_signal);
 		
 		System.out.println("Start searching and generating runfiles...");
 		
 		/*
 		 * Query Expansion with entities, use top 1, 2, 3, 4, 5
-		 */
-		System.out.println("Start Query Expansion with Entities");
-		for(int i = 1; i < 6; i ++) {
-			QueryExpansionWithEntities qewe = new QueryExpansionWithEntities(pagesFile, indexPath, outputPath, i);
-			num_of_runfile ++;
+		 */		
+		if(method_signal.equals("-exp")) {
+			System.out.println("Start Query Expansion with Entities");
+			for(int i = 1; i < 6; i ++) {
+				QueryExpansionWithEntities qewe = new QueryExpansionWithEntities(pagesFile, indexPath, outputPath, i);
+				num_of_runfile ++;
+			}
+			System.out.println("Query Expansion with entities DONE");
 		}
-		System.out.println("Query Expansion with entities DONE");
+	
 		
 		/*
 		 * Query by using kmeans clusters
 		 */
-		System.out.println("Start Query by K-means Cluster");
-		QueryByCluster qbk = new QueryByCluster(pagesFile, indexPath, "-k", kmeans_clu_index, outputPath);
-		num_of_runfile ++;
-		System.out.println("Query by K-means Cluster DONE");
+		else if(method_signal.equals("-kmeansClu")) {
+			System.out.println("Start Query by K-means Cluster");
+			QueryByCluster qbk = new QueryByCluster(pagesFile, indexPath, "-k", kmeans_clu_index, outputPath);
+			num_of_runfile ++;
+			System.out.println("Query by K-means Cluster DONE");
+		}
 		
 		/*
 		Map<String, List<String>> map_qid_ptext = qbk.getModel();
@@ -74,10 +83,12 @@ public class Main {
 		/*
 		 * Query by using types clusters
 		 */
-		System.out.println("Start Query by Types Cluster");
-		QueryByCluster qbc = new QueryByCluster(pagesFile, indexPath, "-c", types_clu_index, outputPath);
-		num_of_runfile ++;
-		System.out.println("Query by Types Cluster DONE");
+		else if(method_signal.equals("-typesClu")) {
+			System.out.println("Start Query by Types Cluster");
+			QueryByCluster qbc = new QueryByCluster(pagesFile, indexPath, "-c", types_clu_index, outputPath);
+			num_of_runfile ++;
+			System.out.println("Query by Types Cluster DONE");
+		}
 		
 		// Start searching for the passages
 //		BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
@@ -97,6 +108,10 @@ public class Main {
 //		System.out.println();
 		
 //		CreateTestSet cts = new CreateTestSet(pageHeadingMap, outputPath+"testArrff");
+		
+		else {
+			usage();
+		}
 		
 		System.out.println("All works DONE. Generate " + num_of_runfile + " runfiles in " + outputPath);
 
