@@ -22,9 +22,9 @@ kmeans_clu_index_Dir: the directory which stores the index file for clusters of 
 
 types_clu_index_Dir: the directory which stores the index file for clusters of types.
 
-The path for lucene index args[2] - /home/ns1077/ParagraphIndexPr2/
-The path for lucene index args[4] - /home/py1004/project/Index_kmeans_cluster
-The path for lucene index args[5] - /home/py1004/project/Index_DBpedia_Entities
+1. The path for lucene index args[2] - /home/ns1077/ParagraphIndexPr2/
+2. The path for lucene index args[4] - /home/py1004/project/Index_kmeans_cluster
+3. The path for lucene index args[5] - /home/py1004/project/Index_DBpedia_Entities
 
 You can also compile the project by using maven. A pom file is generated in the project for that. Please locate to the project and then do
 
