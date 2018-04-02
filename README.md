@@ -40,6 +40,12 @@ A executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" is 
 
 All files you need are set up on the server. 
 
+# Output Description
+
+For your convience, we stored all the outputs for test data for you to evaluate. They are stored here
+
+TREC-Complex-answer-retrieval-Track/Output/Runfiles_testData
+
 # Methods Description
 
 # 1.Pseudo Relevance Feedback with Entities
