@@ -111,6 +111,23 @@ This task uses DBpedia variation for the frequency of its type and and BM25 simi
 
 This method was implemented for top 20 paragraph IDs.
 
+# 6.Naïve Bayes Classifier
+
+In machine learning, naive Bayes classifiers are a family of simple "probabilistic classifiers "based on applying Bayes' theorem with strong (naive) independence assumptions between the features. Naive Bayes is a simple technique for constructing classifiers: models that assign class labels to problem instances, represented as vectors of feature values, where the class labels are drawn from
+some finite set.
+
+# 7.J48 Classifier
+
+J48 is an algorithm used to generate a decision tree. J48 builds decision trees from a set of training data, using the concept of information entropy.The training data is a set of already classified samples. Each sample consists of a p-dimensional vector , where the represent attribute values or features of the sample, as well as the class in which falls.
+
+At each node of the tree, J48 chooses the attribute of the data that most effectively splits its set of samples into subsets enriched in one class or the other. The splitting criterion is the normalized information gain (difference in entropy). The attribute with the highest normalized information gain is chosen to make the decision.
+
+# 8.Random Forest Classifier
+
+Random Forest are an ensemble learning method for classification, regression and other tasks, that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classification) or mean prediction (regression) of the individual trees. Random decision forests correct for decision trees' habit of overfitting to their training set.
+
+
+
 
 
 
