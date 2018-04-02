@@ -2,7 +2,7 @@
 
 # Installation Instruction
 
-# a. Working on your laptop:
+# a. Working on your system:
 
 1.Clone this repository
 
@@ -22,27 +22,21 @@ kmeans_clu_index_Dir: the directory which stores the index file for clusters of 
 
 types_clu_index_Dir: the directory which stores the index file for clusters of types.
 
+The path for lucene index args[2] - /home/ns1077/ParagraphIndexPr2/
+The path for lucene index args[4] - /home/py1004/project/Index_kmeans_cluster
+The path for lucene index args[5] - /home/py1004/project/Index_DBpedia_Entities
 
-You can download the index file for kmeans and types from the server. Address is "/home/py1004/project/Index_kmeans_cluster" and "/home/py1004/project/Index_DBpedia_Entities".
+You can also compile the project by using maven. A pom file is generated in the project for that. Please locate to the project and then do
 
-3.Or you can compile the project by using maven. A pom file is generated in the project for that. Please locate to the project and then do
+# mvn package
 
-mvn package
+then an executable jar called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the same command line as showing above
 
-then a executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the same command line as showing above
+# An-Example-Run
+java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar -classify /home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor /home/ns1077/ParagraphIndexPr2/ /home/ns1077/Runfile/ "/home/py1004/project/Index_kmeans_cluster" "/home/py1004/project/Index_DBpedia_Entities"
 
-Once you run finished you will get
+# would give
 All works DONE. Generate # runfiles in #outputfolder you specified
-
-# b. Working on server
-
-A executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" is stored in "/home/py1004/project"
-
-1.Locate to the directory.
-
-2.Run the command line
-
-All files you need are set up on the server. 
 
 # Output Description
 
@@ -79,7 +73,7 @@ For searching, I used “BM25” of “lucene” in java to compute the similari
     RF_model -RandomForest
     J48_model -J48
 5. All these models are trained with the version 2.0 train from the trec car data releases.
-6. While all three model are running J48 performs faster than any other model J48 and Random Forest performs faster than Naive BAyes.
+
 # 3.Re-rank by Category Clustering
 
 For each entity in Wikipedia, it has a category. We choose the categories which have more than 100 entities to make clusters. And we use the same methodology as K-means cluster to do re-rank for run files. 
