@@ -34,8 +34,8 @@ public class Main {
 		String indexPath = args[2];
 		String outputPath = args[3];
 
-		String kmeans_clu_index = "args[4]";
-		String types_clu_index = "args[5]";
+		String kmeans_clu_index = args[4];
+		String types_clu_index = args[5];
 
 		int num_of_runfile = 0;
 
