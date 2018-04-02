@@ -53,9 +53,9 @@ public class Classify {
 
 	public Classify(Map<String, String> paraHeading, String outputPath, String pagesFile, String indexPath) throws Exception {
 
-		String model_J48 = "/Users/Nithin/Desktop/Model/J48_Page.model";
-		String model_RF = "/Users/Nithin/Desktop/Model/RF_Page.model";
-		String model_NB = " /Users/Nithin/Desktop/Model/NB_Page.model";
+		String model_J48 = "/home/ns1077/Pr2/Model//J48_Page.model";
+		String model_RF = "/home/ns1077/Pr2/Model//RF_Page.model";
+		String model_NB = " /home/ns1077/Pr2/Model//NB_Page.model";
 
 		Classifier clsJ48 = (Classifier) weka.core.SerializationHelper.read(model_J48);
 
