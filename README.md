@@ -67,16 +67,6 @@ To achive this, I took 10,000 paragraphs from “dedup.articles-paragraphs.cbor�
 
 For searching, I used “BM25” of “lucene” in java to compute the similarity between query/clusters and paragraph/clusters to assign cluster to query and generate clusters’ rank for each paragraph. And I used the above algorithm to re-rank.
 
-# 4 Classification
-1.	We have used train v2.0 of the TREC -car dataset to train the classifier.
-2. The smaller is already there in the server.
-3. path for the model in the server is /home/ns1077/Pr2/Model/
-4. There are three types of model in the server now 
-    NB_model -NaiveBayes
-    RF_model -RandomForest
-    J48_model -J48
-5. All these models are trained with the version 2.0 train from the trec car data releases.
-
 # 3.Re-rank by Category Clustering
 
 For each entity in Wikipedia, it has a category. We choose the categories which have more than 100 entities to make clusters. And we use the same methodology as K-means cluster to do re-rank for run files. 
