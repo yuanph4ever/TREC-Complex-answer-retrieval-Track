@@ -2,14 +2,16 @@
 
 # Installation Instruction
 
-1.Clone this repository
+# Steps
+1. Clone this repository
 
-2.Compile the project by using maven. A pom file is generated in the project for that. Please locate to the project and then do "mvn package"
+2. Compile the project by using maven. A pom file is generated in the project for that. Please locate to the project and then do "mvn package"
 
-3.Then an executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the command line 
+3. Then an executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the command line 
 
 java -jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir
 
+# Arguments Description
 Methods_Signal: you want to put "-exp" which indicates run "Pseudo Relevance Feedback with Entities" and this will give you five runfiles in output path; "-kmeansClu" for "Re-Rank by K-means Clustering" to give you one runfile; "-typesClu" for "Re-rank by Category Clustering" to give you one run file; "-classify" for "Classifcation using J48 Classifier" gives you three run file;
 
 Outline_Cbor: the outline files like "train.pages.cbor-outlines.cbor". 
@@ -22,6 +24,7 @@ kmeans_clu_index_Dir: the directory which stores the index file for clusters of 
 
 types_clu_index_Dir: the directory which stores the index file for clusters of types.
 
+# Path on server
 1. arg[0] - one of the following 
    "-exp", "-kmeansClu", "-typesClu", "-classify"
 2. The path for lucene index args[2] - /home/ns1077/ParagraphIndexPr2/
@@ -34,7 +37,7 @@ java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar -classify /home/ns1077/
 # Would give
 All works DONE. Generate # runfiles in [output folder] you specified
 
-# Output Description
+# Outputs
 
 For your convience, we stored all the outputs for test data for you to evaluate. They are stored here
 
