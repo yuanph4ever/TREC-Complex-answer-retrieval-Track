@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.analysis.TokenStream;
@@ -39,23 +40,56 @@ import edu.unh.cs.treccar_v2.Data.PageSkeleton;
 import edu.unh.cs.treccar_v2.Data.Section;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 import edu.unh.cs980.RetrievalModel.BM25.MyQueryBuilder;
+import edu.unh.cs980.nTools.TextClassifier;
+import weka.classifiers.Classifier;
+import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.bayes.NaiveBayesMultinomialUpdateable;
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
 
 public class Classify {
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	private void PageSearch(String outputPath, String indexPath, String pagesFile) throws IOException {
-		File runfile = new File(outputPath + "/runfile_page");
+
+	public Classify(Map<String, String> paraHeading, String outputPath, String pagesFile, String indexPath) throws Exception {
+
+		String model_J48 = "/Users/Nithin/Desktop/Model/J48_Page.model";
+		String model_RF = "/Users/Nithin/Desktop/Model/RF_Page.model";
+		String model_NB = " /Users/Nithin/Desktop/Model/NB_Page.model";
+
+		Classifier clsJ48 = (Classifier) weka.core.SerializationHelper.read(model_J48);
+
+
+		CreateTestSet cts = new CreateTestSet(paraHeading, outputPath);
+
+		DataSource testSource = new DataSource(outputPath + "classification.arff");
+		Instances testingSet = testSource.getDataSet();
+
+		testingSet.setClassIndex(testingSet.numAttributes() - 1);
+
+		classiyPageSearch(outputPath, indexPath, pagesFile, clsJ48, testingSet, "J48");
+		
+		System.out.println("classification results written to the file " +  outputPath + "/" +"J48" + "runfile_pagePr2");
+		
+	}
+
+	private Instance makeInstance(String text, Instances data) {
+		// Create instance of length two.
+		Instance instance = new Instance(2);
+		// Set value for message attribute
+		Attribute messageAtt = data.attribute("text");
+		instance.setValue(messageAtt, messageAtt.addStringValue(text));
+		// Give instance access to attribute information from the dataset.
+		instance.setDataset(data);
+		return instance;
+	}
+
+	private void classiyPageSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier, Instances data, String classifierName) throws Exception {
+		
+		data.setClassIndex(data.numAttributes() - 1);
+		
+		outputPath = outputPath + "/" +classifierName;
+		File runfile = new File(outputPath + "runfile_pagePr2");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
 
@@ -69,12 +103,15 @@ public class Classify {
 
 		int count = 0;
 		int instance = 0;
+		List<String> uniquePara;
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
+			
+			uniquePara = new ArrayList<String>();
 			final String queryId = page.getPageId();
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 50);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 			for (int i = 0; i < scoreDoc.length; i++) {
@@ -88,15 +125,19 @@ public class Classify {
 				final float searchScore = score.score;
 				final int searchRank = i + 1;
 
-
+				double res = classifier.classifyInstance(data.instance(instance));
+				
 
 				System.out.println(".");
-				// writer.write(queryStr + " - " + paragraph + "\n");
-				writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+				
+				if(!(uniquePara.contains(data.classAttribute().value((int) res))))
+				{
+				writer.write(queryId + " Q0 " +data.classAttribute().value((int) res) + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+				}
+				uniquePara.add(data.classAttribute().value((int) res));
 				count++;
-				instance ++;
+				instance++;
 			}
-
 
 		}
 
@@ -107,13 +148,18 @@ public class Classify {
 
 	}
 
-	private void SectionSearch(String outputPath, String indexPath, String pagesFile) throws IOException {
-		File runfile = new File(outputPath + "/runfile_section");
+	private void classifySectionSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier, Instances data, String classifierName) throws Exception {
+		
+		data.setClassIndex(data.numAttributes() - 1);
+		
+		outputPath = outputPath + "/" +classifierName;
+		File runfile = new File(outputPath + "/runfile_sectionPr2");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
 
+		List<String> uniquePara;
 		// paragraphs-run-sections
-		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene");
+		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
 		searcher.setSimilarity(new BM25Similarity());
 		final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
 		final FileInputStream fileInputStream3 = new FileInputStream(new File(pagesFile));
@@ -121,14 +167,13 @@ public class Classify {
 		System.out.println("starting searching for sections ...");
 
 		int count = 0;
-
-
+		int instance = 0;
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 			for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
-
+				uniquePara = new ArrayList<String>();
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 5);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -142,14 +187,20 @@ public class Classify {
 					final float searchScore = score.score;
 					final int searchRank = i + 1;
 
+					double res = classifier.classifyInstance(data.instance(instance));
+					
+
 					System.out.println(".");
-					writer.write(
-							queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+					
+					if(!(uniquePara.contains(data.classAttribute().value((int) res))))
+					{
+					writer.write(queryId + " Q0 " +data.classAttribute().value((int) res) + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+					}
+					uniquePara.add(data.classAttribute().value((int) res));
 					count++;
+					instance++;
 
 				}
-				
-
 
 			}
 		}
@@ -162,8 +213,11 @@ public class Classify {
 
 	}
 
-	private void SectionSearchForLowestHeading(String outputPath, String indexPath, String pagesFile)
+	private void classifySectionSearchForLowestHeading(String outputPath, String indexPath, String pagesFile, Classifier classifier, Instances data, String classifierName)
 			throws IOException {
+		
+		data.setClassIndex(data.numAttributes() - 1);
+		
 		File runfile = new File(outputPath + "/runfile_section_lowestheading");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
@@ -177,8 +231,6 @@ public class Classify {
 		System.out.println("starting searching for sections ...");
 
 		int count = 0;
-		
-
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 			for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
@@ -187,7 +239,7 @@ public class Classify {
 				String queryStr = buildSectionQueryStr(sectionPath); // get the
 																		// lowest
 																		// heading
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 5);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 				for (int i = 0; i < scoreDoc.length; i++) {
 					ScoreDoc score = scoreDoc[i];

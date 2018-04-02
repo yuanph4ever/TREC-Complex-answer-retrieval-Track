@@ -51,21 +51,16 @@ import edu.unh.cs.treccar_v2.read_data.DeserializeData;
  * according to their relevance to a given search query. 
  */
 public class BM25 {
-	
+
 	// Environment Variables for map of query and the paragraph
 	// Right now using these maps to feed the data to classifier
 
 	static List<String> paragraphs;
 	static Map<String, List<String>> passageHeadings = new HashMap<String, List<String>>();
-	
 
-	
 	private Map<String, String> mapPagePassage;
 	private Map<String, String> mapSectionPassage;
 	private Map<String, String> mapLowestSectionPassage;
-	
-	
-	
 
 	/*
 	 * @param 1 = query File ( usually outlines.cbor)
@@ -88,8 +83,8 @@ public class BM25 {
 	private void computeHeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
 		// TODO Auto-generated method stub
 		PageSearch(outputPath, indexPath, pagesFile);
-		//SectionSearch(outputPath, indexPath, pagesFile);
-		//SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
+		SectionSearch(outputPath, indexPath, pagesFile);
+		// SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
 
 	}
 
@@ -113,7 +108,7 @@ public class BM25 {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 			for (int i = 0; i < scoreDoc.length; i++) {
@@ -127,14 +122,12 @@ public class BM25 {
 				final float searchScore = score.score;
 				final int searchRank = i + 1;
 
-
 				mapPagePassage.put(paragraphid, paragraph);
 				System.out.println(".");
 				// writer.write(queryStr + " - " + paragraph + "\n");
 				writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
 				count++;
 			}
-
 
 		}
 
@@ -151,7 +144,7 @@ public class BM25 {
 		FileWriter writer = new FileWriter(runfile);
 
 		// paragraphs-run-sections
-		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene");
+		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
 		searcher.setSimilarity(new BM25Similarity());
 		final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
 		final FileInputStream fileInputStream3 = new FileInputStream(new File(pagesFile));
@@ -159,14 +152,14 @@ public class BM25 {
 		System.out.println("starting searching for sections ...");
 
 		int count = 0;
-		mapSectionPassage = new HashMap<String,String>();
+		mapSectionPassage = new HashMap<String, String>();
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 			for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
 
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 5);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -186,8 +179,6 @@ public class BM25 {
 					count++;
 
 				}
-				
-
 
 			}
 		}
@@ -215,7 +206,7 @@ public class BM25 {
 		System.out.println("starting searching for sections ...");
 
 		int count = 0;
-		
+
 		mapLowestSectionPassage = new HashMap<String, String>();
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
@@ -344,9 +335,6 @@ public class BM25 {
 		}
 		return queryStr;
 	}
-
-
-
 
 	public Map<String, String> getPageHeadingMap() {
 		// TODO Auto-generated method stub

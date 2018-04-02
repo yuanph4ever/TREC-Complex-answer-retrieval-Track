@@ -53,7 +53,7 @@ public class J48Classifier{
   System.out.println(tree.graph());
   System.out.println(tree);
   
-  weka.core.SerializationHelper.write(modelPath + "/trainedModel/J48_Page.model", fc);
+  weka.core.SerializationHelper.write(modelPath + "/J48_Page.model", fc);
 
 //  double pred = tree.classifyInstance("tree");
   //System.out.println("====== RESULT ====== \tCLASSIFIED AS:\t" + );
