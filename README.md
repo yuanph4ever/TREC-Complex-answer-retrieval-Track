@@ -34,65 +34,57 @@ All files you need are set up on the server. You just need to change the argumen
 
 # Methods Description
 
-# Pseudo Relevance Feedback with Entities
+# 1.Pseudo Relevance Feedback with Entities
 
-# Re-Rank by K-means Clustering
+This task expands query by entities of first-round-answers from top1, top3, and top5. By using entities, we can remove the useless words with high term frequency and extract the words which should be given bias. We assume the result will be improved by doing this. We use DBpedia Spotlight, which is a tool for automatically annotating mentions of DBpedia resources in text, to annotate entities from first-round-answers. For searching, we use BM25 method.
 
-# Re-rank by Category Clustering
+# 2.Re-Rank by K-means Clustering
 
-Part 1:
+K-means clustering is a method of vector quantization, originally from signal processing, that is popular for cluster analysis in data mining. K-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as prototype as the cluster.
 
-The indexing for this method involved sequential execution of these four methods:
+This task uses K-means clusters to re-rank runfile. The basic idea is, firstly retrieve paragraphs for queries as we did before. Second, assign a cluster to query by comparing the similarity between them and generate the rank of clusters for each retrieved paragraph and see what the position of cluster for query is and use the reversed number of it as the additional score. Finally, use original score plus additional score to re-rank paragraphs. The algorithm is,
 
-1)	EntityLinking.java
-2)	CurlProcess.java
-3)	Split.java
-4)	Index.java
+Score (query, paragraph) = BM25_score (q, p) + 10 / para_clu_rank (query’s cluster)
 
-The output file location : ****Peihao, Please provide path of the output file**** 
+, where para_clu_rank (x) gives you the position of x in the rank of paragraph’s clusters. For example, if the cluster for query Q is C1 and the rank of clusters for paragraph P is C3, C1, C2 (from top to bottom). Then the final score for P based on Q is the original score (given by BM25) plus 5 (10/2). 
+ 
+To achive this, I took 10,000 paragraphs from “dedup.articles-paragraphs.cbor” to make my corpus for clustering. I developed paraCluster.py to convert texts from clustering corpus to vectors and run K-means from “sklearn.cluster” in python to get clusters. Here I used k = 3 and “tfidf” of terms as the values in vectors. After clustering, I used the labels of each vector to assign each paragraph to its cluster. Then I have three clusters where store the text content of paragraphs. Next, I used lucene to index clusters and finally I have the index file for clusters. Since the index file for clusters is generated offline, the above process will not decreases the speed of searching.
 
-# Re-rank by DBpedia Type
+For searching, I used “BM25” of “lucene” in java to compute the similarity between query/clusters and paragraph/clusters to assign cluster to query and generate clusters’ rank for each paragraph. And I used the above algorithm to re-rank.
 
-Program: Readnprocess.java
+# 3.Re-rank by Category Clustering
 
-Input: Run file with BM25 similarity
+For each entity in Wikipedia, it has a category. We choose the categories which have more than 100 entities to make clusters. And we use the same methodology as K-means cluster to do re-rank for run files. 
 
-Location: : ******provide location for the baseline page test set (top 20)***********
+For each paragraph Ids in the “dedup.articles-paragraphs.cbor”, entities were extracted using DBpedia variation. The extracted entities were then parsed into a java program that executes the curl command, which gives the type for each entity. The entities were then clustered according to their respective type.
 
-Pre requisite:  1) The Dbpedia spotlight server is listening
-	           2) pom file
-                       3) dedup.articles-paragraphs.cbor
-	           Location : ******provide location for the dedup***********
+# 4.Re-rank by Category Clustering
 
+For each entity in Wikipedia, it has a category. We choose the categories which have more than 100 entities to make clusters. And we use the same methodology as K-means cluster to do re-rank for run files. 
 
-Execution procedure:
-1)	Start the DBpedia server
-2)	Execute the file by changing the path for input, output and dedup.articles-paragraphs.cbor
+For each paragraph Ids in the “dedup.articles-paragraphs.cbor”, entities were extracted using DBpedia variation. The extracted entities were then parsed into a java program that executes the curl command, which gives the type for each entity. The entities were then clustered according to their respective type.
 
-The runtime of this run file is around 10 minutes. I have provided the run file of this method for test.pages.cbor-outlines.cbor. 
+# 5.Re-Rank by DBpedia Type and BM25 similarity with weight
 
-Location: ******provide location for the runfile(Rerank_by_type.txt)  that I sent you***********
+This task uses DBpedia variation for the frequency of its type and and BM25 similarity score in each paragraph to re-rank the run file.
 
+1)A search method was implemented, ” BM25”  similarity of “lucene” was used to compute similarity between query and paragraph to generate a baseline run file.
+2) The paragraph IDs of the baseline run file were compared with the “dedup.articles-paragraphs.cbor” to get the text content.
+3) For each paragraph ID, entities and its respective type was gathered using DBpedia spotlight.
+4) The frequency of DBpedia type was clustered for each paragraph ID in the run file.
+5) The run file was then re-ranked as per the descending order of the frequency of type in a paragraph given a query.
+6) The run file generated was further processed to get a better score were both the rank and BM25 score could be used to get an appropriate ranking.
 
-# Re-Rank by DBpedia Type and BM25 similarity with weight
+New score = BM25 similarity score + 1/(Rank of the para id as per frequency of type)
 
-Program: Weight.java
+7) The New score was then used to re-rank the run file. 
 
-Input: Run file with BM25 similarity
-
-Location: : ******provide location for the baseline page test set (top 20)***********
-
-Pre requisite:  1) The Dbpedia spotlight server is listening
-	           2) pom file
-                       3) dedup.articles-paragraphs.cbor
-	           Location : ******provide location for the dedup***********
+This method was implemented for top 20 paragraph IDs.
 
 
-Execution procedure:
-1)	Start the DBpedia server
-2)	Execute the file by changing the path for input, output and dedup.articles-paragraphs.cbor
 
-The runtime of this run file is around 12-15 minutes. I have provided the run file of this method for test.pages.cbor-outlines.cbor. 
 
-Location: ***provide location for the runfile(Rerank _by_weigth.txt) that I sent you****
+
+
+
 
