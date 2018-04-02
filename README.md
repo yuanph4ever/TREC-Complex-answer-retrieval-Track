@@ -10,7 +10,7 @@
 
 java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir
 
-Methods_Signal: you want to put "-exp" which indectas run "Pseudo Relevance Feedback with Entities" and this will give you five runfiles in output path; "-kmeansClu" for "Re-Rank by K-means Clustering" to give you one runfile; "-typesClu" for "Re-rank by Category Clustering" to give you one run file.
+Methods_Signal: you want to put "-exp" which indectas run "Pseudo Relevance Feedback with Entities" and this will give you five runfiles in output path; "-kmeansClu" for "Re-Rank by K-means Clustering" to give you one runfile; "-typesClu" for "Re-rank by Category Clustering" to give you one run file; "-classify" for "Classifcation using J48 Classifier" gives you three run file;
 
 Outline_Cbor: the outline files like "train.pages.cbor-outlines.cbor". 
 
@@ -66,6 +66,16 @@ To achive this, I took 10,000 paragraphs from “dedup.articles-paragraphs.cbor�
 
 For searching, I used “BM25” of “lucene” in java to compute the similarity between query/clusters and paragraph/clusters to assign cluster to query and generate clusters’ rank for each paragraph. And I used the above algorithm to re-rank.
 
+# 4 Classification
+1.	We have used train v2.0 of the TREC -car dataset to train the classifier.
+2. The smaller is already there in the server.
+3. path for the model in the server is /home/ns1077/Pr2/Model/
+4. There are three types of model in the server now 
+    NB_model -NaiveBayes
+    RF_model -RandomForest
+    J48_model -J48
+5. All these models are trained with the version 2.0 train from the trec car data releases.
+6. While all three model are running J48 performs faster than any other model J48 and Random Forest performs faster than Naive BAyes.
 # 3.Re-rank by Category Clustering
 
 For each entity in Wikipedia, it has a category. We choose the categories which have more than 100 entities to make clusters. And we use the same methodology as K-means cluster to do re-rank for run files. 
