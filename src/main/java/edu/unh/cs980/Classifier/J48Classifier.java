@@ -15,9 +15,13 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class J48Classifier{
 
-  public static void main(String args[]) throws Exception{
+  public J48Classifier(String trainSet, String modelPath) throws Exception{
+  
+  System.out.println("Training J48 classifier with the trainset"); 
   //load dataset
-  DataSource source = new DataSource("/Users/Nithin/Desktop/Runfile/pageAr.arff");
+	  
+	  
+  DataSource source = new DataSource("/Users/Nithin/Desktop/Runfile/trainPageHeading.arff");
   Instances dataset = source.getDataSet();
   System.out.println("loaded dataSet");
   //set class index to the last attribute
@@ -49,6 +53,7 @@ public class J48Classifier{
   System.out.println(tree.graph());
   System.out.println(tree);
   
+  weka.core.SerializationHelper.write(modelPath + "/trainedModel/J48_Page.model", fc);
 
 //  double pred = tree.classifyInstance("tree");
   //System.out.println("====== RESULT ====== \tCLASSIFIED AS:\t" + );
