@@ -8,9 +8,19 @@
 
 2.A precompiled jar file can be found in ./target/ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar. Run the program as
 
-java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir
+java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir
 
-Outline_Cbor indicates the outline files like "train.pages.cbor-outlines.cbor". Lucene_INDEX indicates the index file for corpus. Output_Dir indicates the directory you want to store the runfiles. kmeans_clu_index_Dir is the directory which stores the index file for clusters of kmeans. types_clu_index_Dir is the directory which stores the index file for clusters of types.
+Methods_Signal: you want to put "-exp" which indectas run "Pseudo Relevance Feedback with Entities" and this will give you five runfiles in output path; "-kmeansClu" for "Re-Rank by K-means Clustering" to give you one runfile; "-typesClu" for "Re-rank by Category Clustering" to give you one run file.
+
+Outline_Cbor: the outline files like "train.pages.cbor-outlines.cbor". 
+
+Lucene_INDEX: the index file for corpus. 
+
+Output_Dir: the directory you want to store the runfiles. 
+
+kmeans_clu_index_Dir: the directory which stores the index file for clusters of kmeans. 
+
+types_clu_index_Dir: the directory which stores the index file for clusters of types.
 
 You can download the index file for kmeans and types from the server. Address is "/home/py1004/project/Index_kmeans_cluster" and "/home/py1004/project/Index_DBpedia_Entities".
 
@@ -58,11 +68,19 @@ For each entity in Wikipedia, it has a category. We choose the categories which 
 
 For each paragraph Ids in the “dedup.articles-paragraphs.cbor”, entities were extracted using DBpedia variation. The extracted entities were then parsed into a java program that executes the curl command, which gives the type for each entity. The entities were then clustered according to their respective type.
 
-# 4.Re-rank by Category Clustering
+# 4.Re-rank by DBpedia Type
 
-For each entity in Wikipedia, it has a category. We choose the categories which have more than 100 entities to make clusters. And we use the same methodology as K-means cluster to do re-rank for run files. 
+DBpedia spotlight, is a system that automatically annotate text documents with DBpedia URIs. It gives a wide range of entity and type relationship. This relationship is used in this method to check the relevance of a paragraph.
 
-For each paragraph Ids in the “dedup.articles-paragraphs.cbor”, entities were extracted using DBpedia variation. The extracted entities were then parsed into a java program that executes the curl command, which gives the type for each entity. The entities were then clustered according to their respective type.
+This task uses DBpedia variation and the frequency of its type in each paragraph to re-rank the run file.
+1)A search method was implemented, “BM25” similarity of “lucene” was used to compute similarity between query and paragraph to generate a baseline run file.
+2) The paragraph IDs of the baseline run file were compared with the “dedup.articles-paragraphs.cbor” to get the text content.
+3) For each paragraph ID, entities and its respective type was gathered using DBpedia spotlight.
+4) The frequency of DBpedia type was clustered for each paragraph ID in the run file.
+5) The run file was then re-ranked as per the descending order of the frequency of type in a paragraph given a query.
+
+This method was implemented for top 20 paragraph IDs.
+
 
 # 5.Re-Rank by DBpedia Type and BM25 similarity with weight
 
