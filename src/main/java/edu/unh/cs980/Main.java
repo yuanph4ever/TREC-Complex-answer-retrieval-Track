@@ -58,6 +58,14 @@ public class Main {
 		QueryByCluster qbk = new QueryByCluster(pagesFile, indexPath, "-k", kmeans_clu_index, outputPath);
 		num_of_runfile++;
 		System.out.println("Query by K-means Cluster DONE");
+		
+		/*
+		 * Query by using types clusters
+		 */
+		System.out.println("Start Query by Types Cluster");
+		QueryByCluster qbc = new QueryByCluster(pagesFile, indexPath, "-c", types_clu_index, outputPath);
+		num_of_runfile ++;
+		System.out.println("Query by Types Cluster DONE");
 
 		// Nithin
 		// comment my code
