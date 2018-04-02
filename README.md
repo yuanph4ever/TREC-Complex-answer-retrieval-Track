@@ -2,8 +2,6 @@
 
 # Installation Instruction
 
-# a. Working on your system:
-
 1.Clone this repository
 
 2.A precompiled jar file can be found in ./target/ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar. Run the program as
