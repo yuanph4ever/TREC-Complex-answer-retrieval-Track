@@ -36,11 +36,9 @@ A executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" is 
 
 1.Locate to the directory.
 
-2.Run this command line
+2.Run the command line
 
-java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor /home/ns1077/ParagraphIndex_ALL /home/py1004/project/runfiles_output /home/py1004/project/Index_kmeans_cluster /home/py1004/project/Index_DBpedia_Entities
-
-All files you need are set up on the server. You just need to change the argument which is "/home/py1004/project/runfiles_output" to one that you want to use to store the output runfiles.
+All files you need are set up on the server. 
 
 # Methods Description
 
