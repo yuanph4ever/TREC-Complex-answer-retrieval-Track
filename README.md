@@ -22,6 +22,7 @@ kmeans_clu_index_Dir: the directory which stores the index file for clusters of 
 
 types_clu_index_Dir: the directory which stores the index file for clusters of types.
 
+
 You can download the index file for kmeans and types from the server. Address is "/home/py1004/project/Index_kmeans_cluster" and "/home/py1004/project/Index_DBpedia_Entities".
 
 3.Or you can compile the project by using maven. A pom file is generated in the project for that. Please locate to the project and then do
@@ -29,6 +30,9 @@ You can download the index file for kmeans and types from the server. Address is
 mvn package
 
 then a executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the same command line as showing above
+
+Once you run finished you will get
+All works DONE. Generate # runfiles in #outputfolder you specified
 
 # b. Working on server
 
