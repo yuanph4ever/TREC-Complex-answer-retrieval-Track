@@ -61,49 +61,18 @@ public class Main {
 
 		// Nithin
 		// comment my code
-		// String modelPath = args[0];
-		// String trainSet = args[1];
-		// String trainPath = args[2];
-		// String outputPath = args[3];
+		
+		BM25 bm25baseline = new BM25(pagesFile, indexPath, outputPath);
+		
+		Map<String, String> pagepassage = bm25baseline.getPageHeadingMap();
+		Map<String, String> sectionpassage = bm25baseline.getSectionHeadingMap();
+		Map<String, String> lowSectionPassage = bm25baseline.getLowestSectionHeadingMap();
+		
+		
+		
 
-		// Start searching for the passages
-		// BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
-		//
-		// Map<String, List<String>> pageHeadingMap = bm25.getPageHeadingMap();
-		// Map<String, List<String>> sectionHeadingMap =
-		// bm25.getSectionHeadingMap();
-
-		//
-		// System.out.println("Training Set Generated");
-		//
-		// //ClassifyPassageHeadings cpf = new
-		// ClassifyPassageHeadings("/Users/Nithin/Desktop/Runfile/trainPageHeading");
-		//
-		// Classifier cls = (Classifier)
-		// weka.core.SerializationHelper.read("/Users/Nithin/git/TREC-Complex-answer-retrieval-Track/trainedModel/RF_Page.model");
-		//
-		// System.out.println();
-
-		// CreateTestSet cts = new CreateTestSet(pageHeadingMap,
-		// outputPath+"testArrff");
-
-		// String trainfilepath =
-		// "/Users/Nithin/Desktop/train/base.train.cbor-paragraphs.cbor";
-		// HeadingContentExtractor hce = new HeadingContentExtractor();
-
-		// Map<String, String> paragraphsHeadingsFromTrainv2 =
-		// hce.mapParaHeading(trainfilepath);
-
-		// TopicModelGenerator tmg = new
-		// TopicModelGenerator(paragraphsHeadingsFromTrainv2,
-		// outputPath+"/trainPageHeading");
-
-		// Classifier cls = (Classifier)
-		// weka.core.SerializationHelper.read("/Users/Nithin/git/TREC-Complex-answer-retrieval-Track/trainedModel/RF_Page.model");
-
-		// TrainSet ts = new TrainSet(trainPath, outputPath +"10000set");
-		// ClassifyPassageHeadings cpf = new ClassifyPassageHeadings(trainSet,
-		// modelPath);
+		
+		
 	}
 
 }

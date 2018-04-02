@@ -68,7 +68,7 @@ public class TrainSet implements Serializable {
 			headingAdd(paragraphIterator.next());
 			System.out.print(".");
 
-			if (i == 100)
+			if (i == 1000)
 				break;
 
 		}
@@ -86,7 +86,7 @@ public class TrainSet implements Serializable {
 			paragraphAdd(paragraphIterator2.next());
 			System.out.print(".");
 
-			if (i == 100)
+			if (i == 1000)
 				break;
 
 		}

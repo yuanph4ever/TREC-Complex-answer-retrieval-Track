@@ -58,12 +58,13 @@ public class BM25 {
 	static List<String> paragraphs;
 	static Map<String, List<String>> passageHeadings = new HashMap<String, List<String>>();
 	
-	private List<String> pageParagraphs;
-	private List<String> sectionParagraphs;
-	private List<String> lowSectionParagraphs;
+
 	
-	private Map<String, List<String>> mapPagePassage;
-	private Map<String, List<String>> mapSectionPassage;
+	private Map<String, String> mapPagePassage;
+	private Map<String, String> mapSectionPassage;
+	private Map<String, String> mapLowestSectionPassage;
+	
+	
 	
 
 	/*
@@ -106,7 +107,7 @@ public class BM25 {
 		System.out.println("starting searching for pages ...");
 
 		int count = 0;
-		mapPagePassage = new HashMap<String, List<String>>();
+		mapPagePassage = new HashMap<String, String>();
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 			final String queryId = page.getPageId();
 
@@ -114,7 +115,7 @@ public class BM25 {
 
 			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
-			pageParagraphs = new ArrayList<String>();
+
 			for (int i = 0; i < scoreDoc.length; i++) {
 				ScoreDoc score = scoreDoc[i];
 				final Document doc = searcher.doc(score.doc); // to access
@@ -126,14 +127,14 @@ public class BM25 {
 				final float searchScore = score.score;
 				final int searchRank = i + 1;
 
-				pageParagraphs.add(paragraph);
 
+				mapPagePassage.put(paragraphid, paragraph);
 				System.out.println(".");
 				// writer.write(queryStr + " - " + paragraph + "\n");
 				writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
 				count++;
 			}
-			mapPagePassage.put(queryStr, pageParagraphs);
+
 
 		}
 
@@ -158,7 +159,7 @@ public class BM25 {
 		System.out.println("starting searching for sections ...");
 
 		int count = 0;
-		mapSectionPassage = new HashMap<String, List<String>>();
+		mapSectionPassage = new HashMap<String,String>();
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 			for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
@@ -167,7 +168,7 @@ public class BM25 {
 				String queryStr = buildSectionQueryStr(page, sectionPath);
 				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
-				sectionParagraphs = new ArrayList<String>();
+
 				for (int i = 0; i < scoreDoc.length; i++) {
 					ScoreDoc score = scoreDoc[i];
 					final Document doc = searcher.doc(score.doc); // to access
@@ -178,7 +179,7 @@ public class BM25 {
 					final String paragraph = doc.getField("text").stringValue();
 					final float searchScore = score.score;
 					final int searchRank = i + 1;
-					sectionParagraphs.add(paragraph);
+					mapSectionPassage.put(paragraphid, paragraph);
 					System.out.println(".");
 					writer.write(
 							queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
@@ -186,7 +187,7 @@ public class BM25 {
 
 				}
 				
-				mapSectionPassage.put(queryStr, sectionParagraphs);
+
 
 			}
 		}
@@ -215,7 +216,7 @@ public class BM25 {
 
 		int count = 0;
 		
-		mapSectionPassage = new HashMap<String, List<String>>();
+		mapLowestSectionPassage = new HashMap<String, String>();
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 			for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
@@ -233,8 +234,10 @@ public class BM25 {
 																	// content
 					// print score and internal docid
 					final String paragraphid = doc.getField("paragraphid").stringValue();
+					final String paragraph = doc.getField("text").stringValue();
 					final float searchScore = score.score;
 					final int searchRank = i + 1;
+					mapLowestSectionPassage.put(paragraphid, paragraph);
 					System.out.println(".");
 					writer.write(
 							queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
@@ -272,7 +275,7 @@ public class BM25 {
 	}
 
 	// Author: Laura dietz
-	static class MyQueryBuilder {
+	public static class MyQueryBuilder {
 
 		private final StandardAnalyzer analyzer;
 		private List<String> tokens;
@@ -345,14 +348,18 @@ public class BM25 {
 
 
 
-	public Map<String, List<String>> getPageHeadingMap() {
+	public Map<String, String> getPageHeadingMap() {
 		// TODO Auto-generated method stub
 		return mapPagePassage;
 	}
 
-	public Map<String, List<String>> getSectionHeadingMap() {
+	public Map<String, String> getSectionHeadingMap() {
 		// TODO Auto-generated method stub
 		return mapSectionPassage;
 	}
 
+	public Map<String, String> getLowestSectionHeadingMap() {
+		// TODO Auto-generated method stub
+		return mapLowestSectionPassage;
+	}
 }
