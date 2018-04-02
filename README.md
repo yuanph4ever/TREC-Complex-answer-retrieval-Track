@@ -73,10 +73,7 @@ This task uses DBpedia variation for the frequency of its type and and BM25 simi
 3) For each paragraph ID, entities and its respective type was gathered using DBpedia spotlight.
 4) The frequency of DBpedia type was clustered for each paragraph ID in the run file.
 5) The run file was then re-ranked as per the descending order of the frequency of type in a paragraph given a query.
-6) The run file generated was further processed to get a better score were both the rank and BM25 score could be used to get an appropriate ranking.
-
-New score = BM25 similarity score + 1/(Rank of the para id as per frequency of type)
-
+6) The run file generated was further processed to get a better score were both the rank and BM25 score could be used to get an appropriate ranking. New score = BM25 similarity score + 1/(Rank of the para id as per frequency of type)
 7) The New score was then used to re-rank the run file. 
 
 This method was implemented for top 20 paragraph IDs.
