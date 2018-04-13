@@ -82,10 +82,67 @@ public class BM25 {
 	 */
 	private void computeHeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
 		// TODO Auto-generated method stub
-		PageSearch(outputPath, indexPath, pagesFile);
-		SectionSearch(outputPath, indexPath, pagesFile);
+//		PageSearch(outputPath, indexPath, pagesFile);
+//		SectionSearch(outputPath, indexPath, pagesFile);
 		// SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
+		allPageSearch(outputPath, indexPath, pagesFile);
 
+	}
+
+	
+
+	
+
+	private void allPageSearch(String outputPath, String indexPath, String pagesFile) throws IOException {
+		File runfile = new File(outputPath + "/runfile_allPage");
+		runfile.createNewFile();
+		FileWriter writer = new FileWriter(runfile);
+
+		// paragraphs-run-sections
+		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
+		searcher.setSimilarity(new BM25Similarity());
+		final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
+		final FileInputStream fileInputStream3 = new FileInputStream(new File(pagesFile));
+
+		System.out.println("starting searching for sections ...");
+
+		int count = 0;
+		mapSectionPassage = new HashMap<String, String>();
+
+		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
+				final String queryId = page.getPageId();
+
+				String queryStr = buildHierarchialQuery(page);
+				System.out.println(queryStr);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
+				ScoreDoc[] scoreDoc = tops.scoreDocs;
+
+				for (int i = 0; i < scoreDoc.length; i++) {
+					ScoreDoc score = scoreDoc[i];
+					final Document doc = searcher.doc(score.doc); // to access
+																	// stored
+																	// content
+					// print score and internal docid
+					final String paragraphid = doc.getField("paragraphid").stringValue();
+					final String paragraph = doc.getField("text").stringValue();
+					final float searchScore = score.score;
+					final int searchRank = i + 1;
+					mapSectionPassage.put(paragraphid, paragraph);
+					System.out.println(".");
+					writer.write(
+							queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+					count++;
+
+				}
+
+			}
+		
+
+		writer.flush();
+		writer.close();
+
+		System.out.println("Write " + count + " results\nQuery Done!");
+		
 	}
 
 	private void PageSearch(String outputPath, String indexPath, String pagesFile) throws IOException {
@@ -159,6 +216,7 @@ public class BM25 {
 
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
+				System.out.println(queryStr);
 				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 5);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
@@ -335,7 +393,38 @@ public class BM25 {
 		}
 		return queryStr;
 	}
+	
+	
+	private static String buildPageQueryAll(Data.Page page, List<Data.Section> sectionPath)
+	{
+		StringBuilder queryStr = new StringBuilder();
+		queryStr.append(page.getPageName());
+		for (Data.Section section : sectionPath) {
+			queryStr.append(" ").append(section.getHeading());
+		}
 
+		// System.out.println("queryStr = " + queryStr);
+		return queryStr.toString();
+		
+	}
+
+	private String buildHierarchialQuery(Data.Page page) {
+		// TODO Auto-generated method stub
+		StringBuilder queryStr = new StringBuilder();
+		queryStr.append(page.getPageName());
+		
+		for(List<Data.Section> sectionPath : page.flatSectionPaths())
+		{
+			for(Data.Section section : sectionPath)
+			{
+				queryStr.append(" ").append(section.getHeading());
+			}
+		}
+		
+		return queryStr.toString();
+		
+	}
+	
 	public Map<String, String> getPageHeadingMap() {
 		// TODO Auto-generated method stub
 		return mapPagePassage;
