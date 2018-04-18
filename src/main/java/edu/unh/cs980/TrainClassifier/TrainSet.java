@@ -57,7 +57,9 @@ public class TrainSet implements Serializable {
 	private FastVector attributes;
 	ArrayList<String> listOfParagraphs = new ArrayList<String>();
 
-	public TrainSet(String paraFile, String outputPath) throws IOException {
+	
+	// Make Training Data for the classifier
+	public TrainSet(String paraFile, String outputPath, int num) throws IOException {
 		this();
 		final String paragraphsFile = paraFile;
 		final FileInputStream fileInputStream2 = new FileInputStream(new File(paragraphsFile));
@@ -68,7 +70,7 @@ public class TrainSet implements Serializable {
 			headingAdd(paragraphIterator.next());
 			System.out.print(".");
 
-			if (i == 1000)
+			if (i == num)
 				break;
 
 		}
@@ -86,7 +88,7 @@ public class TrainSet implements Serializable {
 			paragraphAdd(paragraphIterator2.next());
 			System.out.print(".");
 
-			if (i == 1000)
+			if (i == num)
 				break;
 
 		}
@@ -159,7 +161,6 @@ public class TrainSet implements Serializable {
 	// Text contain lot of Stop words.
 	// This method is depreciated
 	// Using this for time being.
-	// Planning to use Mallet pipeline for next prototype
 	public String removeStopWords(String input) throws IOException {
 		String sCurrentLine;
 		Set<String> stopwords = new HashSet<String>();
@@ -250,13 +251,18 @@ public class TrainSet implements Serializable {
 	}
 
 	public void createDatasetFile(String path) throws IOException {
-		File f = new File(path + ".arff");
+		File f = new File(path + "/TrainingData.arff");
 		f.createNewFile();
 		FileWriter fw = new FileWriter(f);
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(trainingData.toString());
 		bw.close();
 		System.out.println("check for arff file");
+	}
+	
+	public Instances getTraningData()
+	{
+		return trainingData;	
 	}
 
 }

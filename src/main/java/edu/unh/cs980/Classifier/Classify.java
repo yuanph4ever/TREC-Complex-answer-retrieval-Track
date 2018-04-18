@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,26 +49,29 @@ import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class Classify {
+	private StringToWordVector filter;
 
-	public Classify(Map<String, String> paraHeading, String outputPath, String pagesFile, String indexPath) throws Exception {
+	public Classify( String outputPath, String pagesFile, String indexPath) throws Exception {
 
-		String model_J48 = "/home/ns1077/Pr2/Model//J48_Page.model";
+		String model_J48 = "/Users/Nithin/Desktop/Model/J48_Page.model";
 		String model_RF = "/home/ns1077/Pr2/Model//RF_Page.model";
 		String model_NB = " /home/ns1077/Pr2/Model//NB_Page.model";
 
 		Classifier clsJ48 = (Classifier) weka.core.SerializationHelper.read(model_J48);
 
 
-		CreateTestSet cts = new CreateTestSet(paraHeading, outputPath);
+		//CreateTestSet cts = new CreateTestSet(paraHeading, outputPath);
 
-		DataSource testSource = new DataSource(outputPath + "classification.arff");
-		Instances testingSet = testSource.getDataSet();
+//		DataSource testSource = new DataSource(outputPath + "classification.arff");
+//		Instances testingSet = testSource.getDataSet();
+//
+//		testingSet.setClassIndex(testingSet.numAttributes() - 1);
 
-		testingSet.setClassIndex(testingSet.numAttributes() - 1);
-
-		classiyPageSearch(outputPath, indexPath, pagesFile, clsJ48, testingSet, "J48");
+		classiyPageSearch(outputPath, indexPath, pagesFile, clsJ48, "J48");
 		
 		System.out.println("classification results written to the file " +  outputPath + "/" +"J48" + "runfile_pagePr2");
 		
@@ -84,10 +88,12 @@ public class Classify {
 		return instance;
 	}
 
-	private void classiyPageSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier, Instances data, String classifierName) throws Exception {
+	private void classiyPageSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier,String classifierName) throws Exception {
 		
-		data.setClassIndex(data.numAttributes() - 1);
-		
+		// time being give path for traindata
+		DataSource source = new DataSource("/Users/Nithin/Desktop/TrainSet/TrainSet.arff");
+		Instances trainingData = source.getDataSet();
+		trainingData.setClassIndex(trainingData.numAttributes() - 1);
 		outputPath = outputPath + "/" +classifierName;
 		File runfile = new File(outputPath + "runfile_pagePr2");
 		runfile.createNewFile();
@@ -123,18 +129,38 @@ public class Classify {
 				final String paragraphid = doc.getField("paragraphid").stringValue();
 				final String paragraph = doc.getField("text").stringValue();
 				final float searchScore = score.score;
-				final int searchRank = i + 1;
-
-				double res = classifier.classifyInstance(data.instance(instance));
 				
 
-				System.out.println(".");
 				
-				if(!(uniquePara.contains(data.classAttribute().value((int) res))))
+				Instances testset = trainingData.stringFreeStructure();
+				Instance insta = makeInstance(paragraph, testset);
+				
+		         // Filter instance.
+				
+		      StringToWordVector m_Filter = new StringToWordVector();
+		      m_Filter.setInputFormat(testset);
+		
+		      // Generate word counts from the training data.
+		      	Instances filteredData  = Filter.useFilter(testset, m_Filter);
+		         m_Filter.input(insta);
+		         Instance filteredInstance = m_Filter.output();
+			
+		        double predicted = classifier.classifyInstance(filteredInstance);
+		        
+		        
+				
+		        //double res = classifier.classifyInstance(insta);
+				
+				
+
+				System.out.print(".");
+				
+				if(!(uniquePara.contains(testset.classAttribute().value((int) predicted))))
 				{
-				writer.write(queryId + " Q0 " +data.classAttribute().value((int) res) + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+					final int searchRank = i + 1;
+				writer.write(queryId + " Q0 " +trainingData.classAttribute().value((int) predicted) + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
 				}
-				uniquePara.add(data.classAttribute().value((int) res));
+				uniquePara.add(trainingData.classAttribute().value((int) predicted));
 				count++;
 				instance++;
 			}

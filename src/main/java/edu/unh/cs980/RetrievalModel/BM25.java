@@ -74,6 +74,7 @@ public class BM25 {
 		computeHeadingWeights(outputPath, indexPath, pagesFile);
 	}
 
+	
 	/*
 	 * retrieve passage for 1. using page name as Query 2. Using page name +
 	 * section name as query ( Entire Hierarchy - Example H1/H1.1/H1.1.1) 3.
@@ -82,10 +83,10 @@ public class BM25 {
 	 */
 	private void computeHeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
 		// TODO Auto-generated method stub
-//		PageSearch(outputPath, indexPath, pagesFile);
+		PageSearch(outputPath, indexPath, pagesFile);
 //		SectionSearch(outputPath, indexPath, pagesFile);
 		// SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
-		allPageSearch(outputPath, indexPath, pagesFile);
+		//allPageSearch(outputPath, indexPath, pagesFile);
 
 	}
 
@@ -107,11 +108,11 @@ public class BM25 {
 		System.out.println("starting searching for sections ...");
 
 		int count = 0;
-		mapSectionPassage = new HashMap<String, String>();
+		//mapSectionPassage = new HashMap<String, String>();
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 				final String queryId = page.getPageId();
-
+				System.out.println(page.getSkeleton().toString());
 				String queryStr = buildHierarchialQuery(page);
 				System.out.println(queryStr);
 				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
@@ -124,10 +125,10 @@ public class BM25 {
 																	// content
 					// print score and internal docid
 					final String paragraphid = doc.getField("paragraphid").stringValue();
-					final String paragraph = doc.getField("text").stringValue();
+					//final String paragraph = doc.getField("text").stringValue();
 					final float searchScore = score.score;
 					final int searchRank = i + 1;
-					mapSectionPassage.put(paragraphid, paragraph);
+					//mapSectionPassage.put(paragraphid, paragraph);
 					System.out.println(".");
 					writer.write(
 							queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
