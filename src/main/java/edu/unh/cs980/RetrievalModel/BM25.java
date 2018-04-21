@@ -105,17 +105,17 @@ public class BM25 {
 		final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
 		final FileInputStream fileInputStream3 = new FileInputStream(new File(pagesFile));
 
-		System.out.println("starting searching for sections ...");
+		System.out.println("starting hierarchial searching for pages ...");
 
 		int count = 0;
 		//mapSectionPassage = new HashMap<String, String>();
 
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
 				final String queryId = page.getPageId();
-				System.out.println(page.getSkeleton().toString());
+//				System.out.println(page.getSkeleton().toString());
 				String queryStr = buildHierarchialQuery(page);
-				System.out.println(queryStr);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 1000);
+//				System.out.println(queryStr);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 200);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -181,10 +181,9 @@ public class BM25 {
 				final int searchRank = i + 1;
 
 				mapPagePassage.put(paragraphid, paragraph);
-				System.out.println(".");
+				System.out.print(".");
 				// writer.write(queryStr + " - " + paragraph + "\n");
-				writer.write(
-						queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+				writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
 				count++;
 			}
 
@@ -276,7 +275,7 @@ public class BM25 {
 				String queryStr = buildSectionQueryStr(sectionPath); // get the
 																		// lowest
 																		// heading
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 10);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 				for (int i = 0; i < scoreDoc.length; i++) {
 					ScoreDoc score = scoreDoc[i];

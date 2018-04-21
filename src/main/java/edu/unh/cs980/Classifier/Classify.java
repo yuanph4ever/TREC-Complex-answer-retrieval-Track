@@ -55,7 +55,7 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 public class Classify {
 	private StringToWordVector filter;
 
-	public Classify( String outputPath, String pagesFile, String indexPath) throws Exception {
+	public Classify(String outputPath, String pagesFile, String indexPath) throws Exception {
 
 		String model_J48 = "/Users/Nithin/Desktop/Prototype3/Model/10000/J48_Page.model";
 		String model_RF = "/Users/Nithin/Desktop/Prototype3/Model/10000/RF_Page.model";
@@ -65,17 +65,13 @@ public class Classify {
 		Classifier cls_RF = (Classifier) weka.core.SerializationHelper.read(model_RF);
 
 		System.out.println("Model loaded successfully");
-		//CreateTestSet cts = new CreateTestSet(paraHeading, outputPath);
-
-//		DataSource testSource = new DataSource(outputPath + "classification.arff");
-//		Instances testingSet = testSource.getDataSet();
-//
-//		testingSet.setClassIndex(testingSet.numAttributes() - 1);
 
 		classiyPageSearch(outputPath, indexPath, pagesFile, cls_RF, "RForest");
-		
-		System.out.println("classification results written to the file " +  outputPath + "/" +"RForest" + "runfile_pagePr2");
-		
+		classifySectionSearch(outputPath, indexPath, pagesFile, cls_RF, "RForest");
+
+		System.out.println(
+				"classification results written to the file " + outputPath + "/" + "RForest" + "runfile_pagePr2");
+
 	}
 
 	private Instance makeInstance(String text, Instances data) {
@@ -89,15 +85,16 @@ public class Classify {
 		return instance;
 	}
 
-	private void classiyPageSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier,String classifierName) throws Exception {
-		
+	private void classiyPageSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier,
+			String classifierName) throws Exception {
+
 		System.out.println("classiying pages for bm25");
 		// time being give path for traindata
 		DataSource source = new DataSource("/Users/Nithin/Desktop/Prototype3/trainset/TrainingData.arff");
 		Instances trainingData = source.getDataSet();
 		trainingData.setClassIndex(trainingData.numAttributes() - 1);
-		outputPath = outputPath + "/" +classifierName;
-		File runfile = new File(outputPath + "runfile_pagePr2");
+		outputPath = outputPath + "/" + classifierName;
+		File runfile = new File(outputPath + "runfile_pagePr3");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
 
@@ -113,7 +110,7 @@ public class Classify {
 		int instance = 0;
 		List<String> uniquePara;
 		for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream3)) {
-			
+
 			uniquePara = new ArrayList<String>();
 			final String queryId = page.getPageId();
 
@@ -131,46 +128,33 @@ public class Classify {
 				final String paragraphid = doc.getField("paragraphid").stringValue();
 				final String paragraph = doc.getField("text").stringValue();
 				final float searchScore = score.score;
-				
 
-				
 				Instances testset = trainingData.stringFreeStructure();
 				Instance insta = makeInstance(paragraph, testset);
-				
-		         // Filter instance.
-				
-//		      StringToWordVector m_Filter = new StringToWordVector();
-//		      m_Filter.setInputFormat(testset);
-//		
-//		      // Generate word counts from the training data.
-//		      	Instances filteredData  = Filter.useFilter(testset, m_Filter);
-//		         m_Filter.input(insta);
-//		         Instance filteredInstance = m_Filter.output();
-			
-		        double predicted = classifier.classifyInstance(insta);
-		        final int searchRank = i + 1;
-		        
-		        double[] prediction=classifier.distributionForInstance(insta);
-		        //double res = classifier.classifyInstance(insta);
-				
-				int relevance;
+
+				double predicted = classifier.classifyInstance(insta);
+				final int searchRank = i + 1;
+
+				double[] prediction = classifier.distributionForInstance(insta);
+				// double res = classifier.classifyInstance(insta);
+
+				float relevance;
 
 				System.out.print(".");
-				
-				if(!(uniquePara.contains(testset.classAttribute().value((int) predicted))))
-				{
-					if(prediction[(int) predicted] > 0.2)
-					{
+
+				if (!(uniquePara.contains(testset.classAttribute().value((int) predicted)))) {
+					if (prediction[(int) predicted] > 0.5) {
 						relevance = 1;
+						writer.write(queryId + " Q0 " + trainingData.classAttribute().value((int) predicted) + " "
+								+ searchRank + " " + relevance + " Lucene-BM25\n");
 					}
-					
-					else
-					{
-						relevance = 0;
+
+					else {
+						relevance = searchScore;
+						writer.write(
+								queryId + " Q0 " + paragraphid + " " + searchRank + " " + relevance + " Lucene-BM25\n");
 					}
-					
-					
-					writer.write(queryId + " Q0 " +trainingData.classAttribute().value((int) predicted) + " " + searchRank + " " + relevance + " Lucene-BM25\n");
+
 				}
 				uniquePara.add(trainingData.classAttribute().value((int) predicted));
 				count++;
@@ -186,12 +170,17 @@ public class Classify {
 
 	}
 
-	private void classifySectionSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier, Instances data, String classifierName) throws Exception {
-		
-		data.setClassIndex(data.numAttributes() - 1);
-		
-		outputPath = outputPath + "/" +classifierName;
-		File runfile = new File(outputPath + "/runfile_sectionPr2");
+	private void classifySectionSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier,
+			 String classifierName) throws Exception {
+
+		System.out.println("classiying Sections for bm25");
+		// time being give path for traindata
+		DataSource source = new DataSource("/Users/Nithin/Desktop/Prototype3/trainset/TrainingData.arff");
+		Instances trainingData = source.getDataSet();
+		trainingData.setClassIndex(trainingData.numAttributes() - 1);
+
+		outputPath = outputPath + "/" + classifierName;
+		File runfile = new File(outputPath + "runfile_sectionPr3");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);
 
@@ -211,7 +200,7 @@ public class Classify {
 				uniquePara = new ArrayList<String>();
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 5);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 200);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -225,16 +214,33 @@ public class Classify {
 					final float searchScore = score.score;
 					final int searchRank = i + 1;
 
-					double res = classifier.classifyInstance(data.instance(instance));
-					
+					Instances testset = trainingData.stringFreeStructure();
+					Instance insta = makeInstance(paragraph, testset);
 
-					System.out.println(".");
-					
-					if(!(uniquePara.contains(data.classAttribute().value((int) res))))
-					{
-					writer.write(queryId + " Q0 " +data.classAttribute().value((int) res) + " " + searchRank + " " + searchScore+ " Lucene-BM25\n");
+					double predicted = classifier.classifyInstance(insta);
+
+					double[] prediction = classifier.distributionForInstance(insta);
+					// double res = classifier.classifyInstance(insta);
+
+					float relevance;
+
+					System.out.print(".");
+
+					if (!(uniquePara.contains(testset.classAttribute().value((int) predicted)))) {
+						if (prediction[(int) predicted] > 0.5) {
+							relevance = 1;
+							writer.write(queryId + " Q0 " + trainingData.classAttribute().value((int) predicted) + " "
+									+ searchRank + " " + relevance + " Classify-Lucene-BM25\n");
+						}
+
+						else {
+							relevance = searchScore;
+							writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + relevance
+									+ " Classify_Lucene-BM25\n");
+						}
+
 					}
-					uniquePara.add(data.classAttribute().value((int) res));
+					uniquePara.add(trainingData.classAttribute().value((int) predicted));
 					count++;
 					instance++;
 
@@ -251,11 +257,11 @@ public class Classify {
 
 	}
 
-	private void classifySectionSearchForLowestHeading(String outputPath, String indexPath, String pagesFile, Classifier classifier, Instances data, String classifierName)
-			throws IOException {
-		
+	private void classifySectionSearchForLowestHeading(String outputPath, String indexPath, String pagesFile,
+			Classifier classifier, Instances data, String classifierName) throws IOException {
+
 		data.setClassIndex(data.numAttributes() - 1);
-		
+
 		File runfile = new File(outputPath + "/runfile_section_lowestheading");
 		runfile.createNewFile();
 		FileWriter writer = new FileWriter(runfile);

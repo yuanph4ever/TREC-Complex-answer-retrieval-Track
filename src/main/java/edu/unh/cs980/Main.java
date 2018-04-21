@@ -10,11 +10,11 @@ import java.util.Map;
 
 import edu.unh.cs980.Classifier.ClassifierModel;
 import edu.unh.cs980.Classifier.Classify;
+import edu.unh.cs980.Classifier.ReadRunFileAndClassify;
 import edu.unh.cs980.RetrievalModel.BM25;
 import edu.unh.cs980.TrainClassifier.TrainSet;
 import edu.unh.cs980.entitiesExpansion.QueryExpansionWithEntities;
 import edu.unh.cs980.kmeans.QueryByCluster;
-import ranking.ReadRunFileAndClassify;
 import weka.classifiers.Classifier;
 
 public class Main {
@@ -35,19 +35,24 @@ public class Main {
 		String indexPath = args[1];
 		String outputPath = args[2];
 		
-		//BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
-
+		System.out.println("======================= BaseLine Candidate set=====================================");
+		BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
+		System.out.println("======================= Classifying BM25 Set =====================================");
+		Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
 		String paraPageTrain = "/Users/Nithin/Desktop/Lauras Runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
 		String paraSectionTrain = "/Users/Nithin/Desktop/Lauras Runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
-		ReadRunFileAndClassify rrfc = new ReadRunFileAndClassify(paraPageTrain, indexPath, outputPath);
-		ReadRunFileAndClassify rrfcSec = new ReadRunFileAndClassify(paraSectionTrain, indexPath, outputPath);
+		System.out.println("======================= Classifying Laura Candidate Set ===========================");
+		ReadRunFileAndClassify rrfc = new ReadRunFileAndClassify(paraPageTrain, indexPath, outputPath, "para");
+		ReadRunFileAndClassify rrfcSec = new ReadRunFileAndClassify(paraSectionTrain, indexPath, outputPath, "section");
+		System.out.println(" =================All works done ==================================================");
+		
 		
 		
 		
 		
 		
 
-//		Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
+
 //		String trainFileCorpus = args[0];
 //		String outputPath = args[1];
 //		String modelPath = args[2];
