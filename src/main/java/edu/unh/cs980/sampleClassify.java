@@ -12,7 +12,9 @@ public class sampleClassify {
 
 	public sampleClassify(String para) throws Exception {
 		
+		System.out.println(" load Model Random Forest");
 		Classifier clsRF = (Classifier) weka.core.SerializationHelper.read("/Users/Nithin/Desktop/Prototype3/Model/10000/RF_Page.model");
+		System.out.println(" load Success");
 		DataSource source = new DataSource("/Users/Nithin/Desktop/Prototype3/trainset/TrainingData.arff");
 		Instances trainingData = source.getDataSet();
 		trainingData.setClassIndex(trainingData.numAttributes() - 1);
@@ -22,6 +24,8 @@ public class sampleClassify {
 
 		double predicted = clsRF.classifyInstance(insta);
 		System.out.println(trainingData.classAttribute().value((int) predicted));
+		double[] prediction=clsRF.distributionForInstance(insta);
+		System.out.println(prediction[(int) predicted]);
 	}
 
 	private Instance makeInstance(String text, Instances data) {

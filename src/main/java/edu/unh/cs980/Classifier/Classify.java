@@ -57,13 +57,14 @@ public class Classify {
 
 	public Classify( String outputPath, String pagesFile, String indexPath) throws Exception {
 
-		String model_J48 = "/Users/Nithin/Desktop/Model/J48_Page.model";
-		String model_RF = "/home/ns1077/Pr2/Model//RF_Page.model";
+		String model_J48 = "/Users/Nithin/Desktop/Prototype3/Model/10000/J48_Page.model";
+		String model_RF = "/Users/Nithin/Desktop/Prototype3/Model/10000/RF_Page.model";
 		String model_NB = " /home/ns1077/Pr2/Model//NB_Page.model";
 
-		Classifier clsJ48 = (Classifier) weka.core.SerializationHelper.read(model_J48);
+		System.out.println(" load Model Random Forest");
+		Classifier cls_RF = (Classifier) weka.core.SerializationHelper.read(model_RF);
 
-
+		System.out.println("Model loaded successfully");
 		//CreateTestSet cts = new CreateTestSet(paraHeading, outputPath);
 
 //		DataSource testSource = new DataSource(outputPath + "classification.arff");
@@ -71,9 +72,9 @@ public class Classify {
 //
 //		testingSet.setClassIndex(testingSet.numAttributes() - 1);
 
-		classiyPageSearch(outputPath, indexPath, pagesFile, clsJ48, "J48");
+		classiyPageSearch(outputPath, indexPath, pagesFile, cls_RF, "RForest");
 		
-		System.out.println("classification results written to the file " +  outputPath + "/" +"J48" + "runfile_pagePr2");
+		System.out.println("classification results written to the file " +  outputPath + "/" +"RForest" + "runfile_pagePr2");
 		
 	}
 
@@ -90,8 +91,9 @@ public class Classify {
 
 	private void classiyPageSearch(String outputPath, String indexPath, String pagesFile, Classifier classifier,String classifierName) throws Exception {
 		
+		System.out.println("classiying pages for bm25");
 		// time being give path for traindata
-		DataSource source = new DataSource("/Users/Nithin/Desktop/TrainSet/TrainSet.arff");
+		DataSource source = new DataSource("/Users/Nithin/Desktop/Prototype3/trainset/TrainingData.arff");
 		Instances trainingData = source.getDataSet();
 		trainingData.setClassIndex(trainingData.numAttributes() - 1);
 		outputPath = outputPath + "/" +classifierName;
@@ -117,7 +119,7 @@ public class Classify {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 50);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 300);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 			for (int i = 0; i < scoreDoc.length; i++) {
@@ -137,28 +139,38 @@ public class Classify {
 				
 		         // Filter instance.
 				
-		      StringToWordVector m_Filter = new StringToWordVector();
-		      m_Filter.setInputFormat(testset);
-		
-		      // Generate word counts from the training data.
-		      	Instances filteredData  = Filter.useFilter(testset, m_Filter);
-		         m_Filter.input(insta);
-		         Instance filteredInstance = m_Filter.output();
+//		      StringToWordVector m_Filter = new StringToWordVector();
+//		      m_Filter.setInputFormat(testset);
+//		
+//		      // Generate word counts from the training data.
+//		      	Instances filteredData  = Filter.useFilter(testset, m_Filter);
+//		         m_Filter.input(insta);
+//		         Instance filteredInstance = m_Filter.output();
 			
-		        double predicted = classifier.classifyInstance(filteredInstance);
+		        double predicted = classifier.classifyInstance(insta);
+		        final int searchRank = i + 1;
 		        
-		        
-				
+		        double[] prediction=classifier.distributionForInstance(insta);
 		        //double res = classifier.classifyInstance(insta);
 				
-				
+				int relevance;
 
 				System.out.print(".");
 				
 				if(!(uniquePara.contains(testset.classAttribute().value((int) predicted))))
 				{
-					final int searchRank = i + 1;
-				writer.write(queryId + " Q0 " +trainingData.classAttribute().value((int) predicted) + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+					if(prediction[(int) predicted] > 0.2)
+					{
+						relevance = 1;
+					}
+					
+					else
+					{
+						relevance = 0;
+					}
+					
+					
+					writer.write(queryId + " Q0 " +trainingData.classAttribute().value((int) predicted) + " " + searchRank + " " + relevance + " Lucene-BM25\n");
 				}
 				uniquePara.add(trainingData.classAttribute().value((int) predicted));
 				count++;
@@ -220,7 +232,7 @@ public class Classify {
 					
 					if(!(uniquePara.contains(data.classAttribute().value((int) res))))
 					{
-					writer.write(queryId + " Q0 " +data.classAttribute().value((int) res) + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+					writer.write(queryId + " Q0 " +data.classAttribute().value((int) res) + " " + searchRank + " " + searchScore+ " Lucene-BM25\n");
 					}
 					uniquePara.add(data.classAttribute().value((int) res));
 					count++;

@@ -84,9 +84,9 @@ public class BM25 {
 	private void computeHeadingWeights(String outputPath, String indexPath, String pagesFile) throws IOException {
 		// TODO Auto-generated method stub
 		PageSearch(outputPath, indexPath, pagesFile);
-//		SectionSearch(outputPath, indexPath, pagesFile);
-		// SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
-		//allPageSearch(outputPath, indexPath, pagesFile);
+		SectionSearch(outputPath, indexPath, pagesFile);
+		SectionSearchForLowestHeading(outputPath, indexPath, pagesFile);
+		allPageSearch(outputPath, indexPath, pagesFile);
 
 	}
 
@@ -115,7 +115,7 @@ public class BM25 {
 				System.out.println(page.getSkeleton().toString());
 				String queryStr = buildHierarchialQuery(page);
 				System.out.println(queryStr);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 1000);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -166,7 +166,7 @@ public class BM25 {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 1000);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 			for (int i = 0; i < scoreDoc.length; i++) {
@@ -183,7 +183,8 @@ public class BM25 {
 				mapPagePassage.put(paragraphid, paragraph);
 				System.out.println(".");
 				// writer.write(queryStr + " - " + paragraph + "\n");
-				writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+				writer.write(
+						queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
 				count++;
 			}
 
@@ -218,7 +219,7 @@ public class BM25 {
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
 				System.out.println(queryStr);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 5);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 500);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -257,7 +258,7 @@ public class BM25 {
 		FileWriter writer = new FileWriter(runfile);
 
 		// paragraphs-run-sections
-		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene");
+		IndexSearcher searcher = setupIndexSearcher(indexPath, "paragraph.lucene.vectors");
 		searcher.setSimilarity(new BM25Similarity());
 		final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
 		final FileInputStream fileInputStream3 = new FileInputStream(new File(pagesFile));

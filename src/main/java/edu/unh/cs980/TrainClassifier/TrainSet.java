@@ -251,7 +251,7 @@ public class TrainSet implements Serializable {
 	}
 
 	public void createDatasetFile(String path) throws IOException {
-		File f = new File(path + "/TrainingData.arff");
+		File f = new File(path + "/TrainingData5000.arff");
 		f.createNewFile();
 		FileWriter fw = new FileWriter(f);
 		BufferedWriter bw = new BufferedWriter(fw);
