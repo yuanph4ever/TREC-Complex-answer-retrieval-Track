@@ -9,7 +9,7 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 public class NaiveBayes {
 
 	public NaiveBayes(String arffFile, String modelPath) throws Exception {
-		DataSource trainSource = new DataSource("/Users/Nithin/Desktop/Runfile/trainPageHeading.arff");
+		DataSource trainSource = new DataSource(arffFile);
 		Instances trainingSet = trainSource.getDataSet();
 		if (trainingSet.classIndex() == -1)
 			trainingSet.setClassIndex(trainingSet.numAttributes() - 1);

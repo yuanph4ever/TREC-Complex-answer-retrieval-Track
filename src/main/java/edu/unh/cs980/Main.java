@@ -2,14 +2,17 @@
 package edu.unh.cs980;
 
 import java.io.FileInputStream;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.Map;
 
+import edu.unh.cs980.Classifier.ClassifierModel;
 import edu.unh.cs980.Classifier.Classify;
-import edu.unh.cs980.Classifier.ClassifyPassageHeadings;
+import edu.unh.cs980.Classifier.ReadRunFileAndClassify;
 import edu.unh.cs980.RetrievalModel.BM25;
+import edu.unh.cs980.TrainClassifier.TrainSet;
 import edu.unh.cs980.entitiesExpansion.QueryExpansionWithEntities;
 import edu.unh.cs980.kmeans.QueryByCluster;
 import weka.classifiers.Classifier;
@@ -86,15 +89,37 @@ public class Main {
 		}
 
 		else if (method_signal.equals("-classify")) {
-			BM25 bm25baseline = new BM25(pagesFile, indexPath, outputPath);
+			
+			
+			// Nithin - methods
+			/**********************************************************************************************************/
 
-			Map<String, String> pagepassage = bm25baseline.getPageHeadingMap();
-			Map<String, String> sectionpassage = bm25baseline.getSectionHeadingMap();
+			System.out.println("======================= BaseLine Candidate set=====================================");
+			BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
 
-			Classify classifyPage = new Classify(pagepassage, outputPath, pagesFile, indexPath);
-			num_of_runfile++;
+			/**********************************************************************************************************/
+
+			System.out.println("======================= Classifying BM25 Set =====================================");
+			Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
+
+			/**********************************************************************************************************/
+
+			// Train
+			String paraPageTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
+			String paraSectionTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
+			// Test
+			String paraPageTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
+			String paraSectionTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
+
+			System.out.println("======================= Classifying Laura Candidate Set ===========================");
+			ReadRunFileAndClassify rrfc = new ReadRunFileAndClassify(paraPageTrain, indexPath, outputPath, "para");
+			ReadRunFileAndClassify rrfcSec = new ReadRunFileAndClassify(paraSectionTrain, indexPath, outputPath,
+					"section");
+			System.out.println(" =================All works done ==================================================");
+
+			/**********************************************************************************************************/
 		}
-		
+
 		// Print usage
 		else {
 			usage();
@@ -103,5 +128,7 @@ public class Main {
 		System.out.println("All works DONE. Generate " + num_of_runfile + " runfiles in " + outputPath);
 
 	}
+
+	
 
 }
