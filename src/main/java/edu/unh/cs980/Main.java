@@ -34,7 +34,7 @@ public class Main {
 		String pagesFile = args[0];
 		String indexPath = args[1];
 		String outputPath = args[2];
-		
+
 		System.out.println("======================= BaseLine Candidate set=====================================");
 		BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
 		System.out.println("======================= Classifying BM25 Set =====================================");
