@@ -1,4 +1,6 @@
-package example;
+package edu.unh.cs980.prototype2_Merge;
+
+
 
 
 import java.io.FileWriter;

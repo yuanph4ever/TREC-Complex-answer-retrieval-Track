@@ -134,7 +134,7 @@ public class ReadRunFileAndClassify {
 
 			System.out.print(".");
 
-			if (prediction[(int) predicted] > 0.2) {
+			if (prediction[(int) predicted] > 0.5) {
 				relevance = 1;
 				writer.write(tokens[0] + " Q0 " + trainingData.classAttribute().value((int) predicted) + " " + tokens[3]
 						+ " " + relevance + " Classifier-Laura\n");
@@ -146,7 +146,8 @@ public class ReadRunFileAndClassify {
 						tokens[0] + " Q0 " + tokens[2] + " " + tokens[3] + " " + relevance + " Classifier-Laura\n");
 			}
 
-			if ((i == 100)) {
+			int num = 0;
+			if ((num == 100)) {
 				System.out.println(i);
 				int counter = 0;
 				while (counter < 900) {
@@ -155,7 +156,7 @@ public class ReadRunFileAndClassify {
 				}
 			}
 
-			if (i > 1000) {
+			if (num > 1000) {
 
 				String hundred = "100";
 				String lineNumber = new Integer(i).toString();
