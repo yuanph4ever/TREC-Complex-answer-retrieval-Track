@@ -1,4 +1,4 @@
-package edu.unh.cs980;
+package edu.unh.cs980.nTools;
 
 import weka.classifiers.Classifier;
 import weka.core.Attribute;

@@ -71,6 +71,34 @@ public class Classify {
 
 		System.out.println(
 				"classification results written to the file " + outputPath + "/" + "RForest" + "runfile_pagePr2");
+		
+		/**********************************************************************************************************/
+		
+		System.out.println(" load J48");
+		Classifier cls_J48 = (Classifier) weka.core.SerializationHelper.read(model_J48);
+
+		System.out.println("Model loaded successfully");
+
+		classiyPageSearch(outputPath, indexPath, pagesFile, cls_J48, "J-48");
+		classifySectionSearch(outputPath, indexPath, pagesFile, cls_J48, "J-48");
+
+		System.out.println(
+				"classification results written to the file " + outputPath + "/" + "J-48" + "runfile_pagePr2");
+		
+		/**********************************************************************************************************/
+		
+		System.out.println(" load Naive Bayes");
+		Classifier cls_NB = (Classifier) weka.core.SerializationHelper.read(model_NB);
+
+		System.out.println("Model loaded successfully");
+
+		classiyPageSearch(outputPath, indexPath, pagesFile, cls_NB, "NB");
+		classifySectionSearch(outputPath, indexPath, pagesFile, cls_NB, "NB");
+
+		System.out.println(
+				"classification results written to the file " + outputPath + "/" + "NB" + "runfile_pagePr2");
+		
+		System.out.println("Classification done for pages and section for the candidate set");
 
 	}
 
@@ -90,7 +118,7 @@ public class Classify {
 
 		System.out.println("classiying pages for bm25");
 		// time being give path for traindata
-		DataSource source = new DataSource("/Users/Nithin/Desktop/Prototype3/trainset/TrainingData.arff");
+		DataSource source = new DataSource("/home/ns1077/Prototype3/TrainingData/TrainingData.arff");
 		Instances trainingData = source.getDataSet();
 		trainingData.setClassIndex(trainingData.numAttributes() - 1);
 		outputPath = outputPath + "/" + classifierName;
@@ -175,7 +203,7 @@ public class Classify {
 
 		System.out.println("classiying Sections for bm25");
 		// time being give path for traindata
-		DataSource source = new DataSource("/Users/Nithin/Desktop/Prototype3/trainset/TrainingData.arff");
+		DataSource source = new DataSource("/home/ns1077/Prototype3/TrainingData/TrainingData.arff");
 		Instances trainingData = source.getDataSet();
 		trainingData.setClassIndex(trainingData.numAttributes() - 1);
 
@@ -200,7 +228,7 @@ public class Classify {
 				uniquePara = new ArrayList<String>();
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 200);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 300);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -283,7 +311,7 @@ public class Classify {
 				String queryStr = buildSectionQueryStr(sectionPath); // get the
 																		// lowest
 																		// heading
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 5);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 300);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 				for (int i = 0; i < scoreDoc.length; i++) {
 					ScoreDoc score = scoreDoc[i];

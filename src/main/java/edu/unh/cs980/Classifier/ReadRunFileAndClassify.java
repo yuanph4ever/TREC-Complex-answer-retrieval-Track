@@ -46,9 +46,10 @@ public class ReadRunFileAndClassify {
 
 	public ReadRunFileAndClassify(String File, String indexPath, String outputPath, String type) throws Exception {
 		// readFromFile(File);
-		String model_J48 = "/Users/Nithin/Desktop/Prototype3/Model/10000/J48_Page.model";
-		String model_RF = "/Users/Nithin/Desktop/Prototype3/Model/10000/RF_Page.model";
-		String model_NB = " /home/ns1077/Pr2/Model//NB_Page.model";
+		String model_J48 = "/home/ns1077/Model/J48_Page.model";
+		String model_RF = "/home/ns1077/Model/RF_Page.model";
+		String model_NB = "/home/ns1077/Model/NB_Page.model";
+
 
 		System.out.println("=========================== Using Saved Model ===============================");
 		System.out.println(" load Model J48");
@@ -65,6 +66,9 @@ public class ReadRunFileAndClassify {
 		Classifier cls_NB = (Classifier) weka.core.SerializationHelper.read(model_NB);
 		classifyUsingSavedModelFromRunFile(File, indexPath, cls_RF, "NaiveBayes", outputPath, type);
 		System.out.println("Model loaded successfully");
+		
+		
+		System.out.println("=========================== New Candidate Set Classified ===============================");
 	}
 
 	private void readFromFile(String File) throws IOException {
@@ -87,7 +91,7 @@ public class ReadRunFileAndClassify {
 
 		System.out.println("classiying pages for Laura Candidate Set");
 		// time being give path for traindata
-		DataSource source = new DataSource("/Users/Nithin/Desktop/Prototype3/trainset/TrainingData.arff");
+		DataSource source = new DataSource("/home/ns1077/Prototype3/TrainingData/TrainingData.arff");
 		Instances trainingData = source.getDataSet();
 		trainingData.setClassIndex(trainingData.numAttributes() - 1);
 
