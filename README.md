@@ -32,7 +32,7 @@ types_clu_index_Dir: the directory which stores the index file for clusters of t
 4. The path for "entities cluster" index args[4] - /home/py1004/project/Index_DBpedia_Entities
 
 # An-Example-Run
-java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar -classify /home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor /home/ns1077/ParagraphIndexPr2/ /home/ns1077/Runfile/ "/home/py1004/project/Index_kmeans_cluster" "/home/py1004/project/Index_DBpedia_Entities"
+java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar -classify /home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor /home/ns1077/ParagraphIndexPr2/ /home/ns1077/Runfile/ 
 
 When the program is running, you can see messages from console. The messages indicate the process. 
 
