@@ -28,7 +28,7 @@ public class ReduceTop100
 	   FileWriter fw = new FileWriter(file);
 	   while ((strLine = br.readLine()) != null)   {
 		   String[] tokens = strLine.split(" ");
-		   Reduce record = new Reduce(tokens[0],tokens[1],tokens[2]);
+		   ReduceTop100 record = new ReduceTop100(tokens[0],tokens[1],tokens[2]);
 		   String temp = tokens[3];   
 		   String str = temp;
 		

@@ -96,10 +96,10 @@ public class ReadRunFileAndClassify {
 		trainingData.setClassIndex(trainingData.numAttributes() - 1);
 
 		if (type == "para")
-			outputPath = outputPath + "/" + classifierName + "_Para_";
+			outputPath = outputPath + "/" + classifierName + "_Para_NewCandidate";
 
 		if (type == "section")
-			outputPath = outputPath + "/" + classifierName + "_Section_";
+			outputPath = outputPath + "/" + classifierName + "_Section_NewCandidate";
 
 		// outputPath = outputPath + "/" + classifierName;
 		File runfile = new File(outputPath + "Laurarunfile_Pr3");
@@ -146,8 +146,7 @@ public class ReadRunFileAndClassify {
 						tokens[0] + " Q0 " + tokens[2] + " " + tokens[3] + " " + relevance + " Classifier-Laura\n");
 			}
 
-			int num = 0;
-			if ((num == 100)) {
+			if ((i == 100)) {
 				System.out.println(i);
 				int counter = 0;
 				while (counter < 900) {
@@ -156,7 +155,7 @@ public class ReadRunFileAndClassify {
 				}
 			}
 
-			if (num > 1000) {
+			if (i == 1000) {
 
 				String hundred = "100";
 				String lineNumber = new Integer(i).toString();

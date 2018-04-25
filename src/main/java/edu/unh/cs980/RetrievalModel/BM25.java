@@ -218,7 +218,7 @@ public class BM25 {
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
 				System.out.println(queryStr);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 500);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 800);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -275,7 +275,7 @@ public class BM25 {
 				String queryStr = buildSectionQueryStr(sectionPath); // get the
 																		// lowest
 																		// heading
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 300);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 				for (int i = 0; i < scoreDoc.length; i++) {
 					ScoreDoc score = scoreDoc[i];

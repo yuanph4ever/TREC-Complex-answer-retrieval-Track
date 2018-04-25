@@ -72,7 +72,7 @@ public class Classify {
 		classifySectionSearch(outputPath, indexPath, pagesFile, cls_J48, "J-48");
 
 		System.out
-				.println("classification results written to the file " + outputPath + "/" + "J-48" + "runfile_pagePr2");
+				.println("classification results written to the file " + outputPath + "/" + "J-48" + "runfile_pagePr3");
 
 		/**********************************************************************************************************/
 
@@ -85,7 +85,7 @@ public class Classify {
 		classifySectionSearch(outputPath, indexPath, pagesFile, cls_RF, "RForest");
 
 		System.out.println(
-				"classification results written to the file " + outputPath + "/" + "RForest" + "runfile_pagePr2");
+				"classification results written to the file " + outputPath + "/" + "RForest" + "runfile_pagePr3");
 
 		/**********************************************************************************************************/
 
@@ -97,7 +97,7 @@ public class Classify {
 		classiyPageSearch(outputPath, indexPath, pagesFile, cls_NB, "NB");
 		classifySectionSearch(outputPath, indexPath, pagesFile, cls_NB, "NB");
 
-		System.out.println("classification results written to the file " + outputPath + "/" + "NB" + "runfile_pagePr2");
+		System.out.println("classification results written to the file " + outputPath + "/" + "NB" + "runfile_pagePr3");
 
 		System.out.println("Classification done for pages and section for the candidate set");
 
@@ -145,7 +145,7 @@ public class Classify {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 300);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 500);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 			for (int i = 0; i < scoreDoc.length; i++) {
@@ -229,7 +229,7 @@ public class Classify {
 				uniquePara = new ArrayList<String>();
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 300);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 800);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
