@@ -144,6 +144,8 @@ public class Indexer {
 		doc.add(new StringField("paragraphid", p.getParaId(), Field.Store.YES)); // don't
 																					// tokenize
 																					// this!
+		
+		
 		doc.add(new StringField("entities", String.join(" ", p.getEntitiesOnly()), Field.Store.YES));
 		System.out.println(p.getBodies());
 		return doc;

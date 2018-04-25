@@ -2,15 +2,17 @@
 
 # Installation Instruction
 
-# a. Working on your laptop:
+# Steps
+1. Clone this repository
 
-1.Clone this repository
+2. Compile the project by using maven. A pom file is generated in the project for that. Please locate to the project and then do "mvn package"
 
-2.A precompiled jar file can be found in ./target/ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar. Run the program as
+3. Then an executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the command line 
 
-java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir
+java -jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir
 
-Methods_Signal: you want to put "-exp" which indectas run "Pseudo Relevance Feedback with Entities" and this will give you five runfiles in output path; "-kmeansClu" for "Re-Rank by K-means Clustering" to give you one runfile; "-typesClu" for "Re-rank by Category Clustering" to give you one run file.
+# Arguments Description
+Methods_Signal: you want to put "-exp" which indicates run "Pseudo Relevance Feedback with Entities" and this will give you five runfiles in output path; "-kmeansClu" for "Re-Rank by K-means Clustering" to give you one runfile; "-typesClu" for "Re-rank by Category Clustering" to give you one run file; "-classify" for "Classifcation using J48 Classifier" gives you three run file;
 
 Outline_Cbor: the outline files like "train.pages.cbor-outlines.cbor". 
 
@@ -22,23 +24,25 @@ kmeans_clu_index_Dir: the directory which stores the index file for clusters of 
 
 types_clu_index_Dir: the directory which stores the index file for clusters of types.
 
-You can download the index file for kmeans and types from the server. Address is "/home/py1004/project/Index_kmeans_cluster" and "/home/py1004/project/Index_DBpedia_Entities".
+# Path on server
+1. arg[0] - one of the following 
+   "-exp", "-kmeansClu", "-typesClu", "-classify"
+2. The path for lucene index args[2] - /home/ns1077/ParagraphIndexPr2/
+3. The path for lucene index args[4] - /home/py1004/project/Index_kmeans_cluster
+4. The path for lucene index args[5] - /home/py1004/project/Index_DBpedia_Entities
 
-3.Or you can compile the project by using maven. A pom file is generated in the project for that. Please locate to the project and then do
+# An-Example-Run
+java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar -classify /home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor /home/ns1077/ParagraphIndexPr2/ /home/ns1077/Runfile/ "/home/py1004/project/Index_kmeans_cluster" "/home/py1004/project/Index_DBpedia_Entities"
 
-mvn package
+When the program is running, you can see messages from console. The messages indicate the process. 
 
-then a executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the same command line as showing above
+When the program is done, you can see a message like "All works DONE. Generate [number of runfiles] runfiles in [output folder you specified]" from console.
 
-# b. Working on server
+# Outputs
 
-A executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" is stored in "/home/py1004/project"
+For your convience, we stored all the outputs for test data for you to evaluate. They are stored here
 
-1.Locate to the directory.
-
-2.Run the command line
-
-All files you need are set up on the server. 
+TREC-Complex-answer-retrieval-Track/Output/Runfiles_testData
 
 # Methods Description
 
@@ -93,6 +97,23 @@ This task uses DBpedia variation for the frequency of its type and and BM25 simi
 7) The New score was then used to re-rank the run file. 
 
 This method was implemented for top 20 paragraph IDs.
+
+# 6.Naïve Bayes Classifier
+
+In machine learning, naive Bayes classifiers are a family of simple "probabilistic classifiers "based on applying Bayes' theorem with strong (naive) independence assumptions between the features. Naive Bayes is a simple technique for constructing classifiers: models that assign class labels to problem instances, represented as vectors of feature values, where the class labels are drawn from
+some finite set.
+
+# 7.J48 Classifier
+
+J48 is an algorithm used to generate a decision tree. J48 builds decision trees from a set of training data, using the concept of information entropy.The training data is a set of already classified samples. Each sample consists of a p-dimensional vector , where the represent attribute values or features of the sample, as well as the class in which falls.
+
+At each node of the tree, J48 chooses the attribute of the data that most effectively splits its set of samples into subsets enriched in one class or the other. The splitting criterion is the normalized information gain (difference in entropy). The attribute with the highest normalized information gain is chosen to make the decision.
+
+# 8.Random Forest Classifier
+
+Random Forest are an ensemble learning method for classification, regression and other tasks, that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classification) or mean prediction (regression) of the individual trees. Random decision forests correct for decision trees' habit of overfitting to their training set.
+
+
 
 
 

@@ -390,7 +390,8 @@ public class QueryByCluster {
 				s = 1/p;
 				//System.out.println("plus score : " + s);
 			}else {
-				s = -(score/2);
+				//s = -(score/2);
+				s = 0;
 				//System.out.println("minus score : " + s);
 			}
 		}

@@ -21,7 +21,7 @@ public class J48Classifier{
   //load dataset
 	  
 	  
-  DataSource source = new DataSource("/Users/Nithin/Desktop/Runfile/trainPageHeading.arff");
+  DataSource source = new DataSource(trainSet);
   Instances dataset = source.getDataSet();
   System.out.println("loaded dataSet");
   //set class index to the last attribute
@@ -31,31 +31,31 @@ public class J48Classifier{
   //the base classifier
   J48 tree = new J48();
 
-  //the filter
+//  //the filter
   StringToWordVector filter = new StringToWordVector();
   filter.setInputFormat(dataset);
   filter.setIDFTransform(true);
   filter.setUseStoplist(true);
   System.out.println("Filter applied - StringtoWord");
-  LovinsStemmer stemmer = new LovinsStemmer();
-  filter.setStemmer(stemmer);
-  filter.setLowerCaseTokens(true);
-  System.out.println("Stemmer done");
-  //Create the FilteredClassifier object
+//  LovinsStemmer stemmer = new LovinsStemmer();
+//  filter.setStemmer(stemmer);
+//  filter.setLowerCaseTokens(true);
+//  System.out.println("Stemmer done");
+//  //Create the FilteredClassifier object
   FilteredClassifier fc = new FilteredClassifier();
   //specify filter
   fc.setFilter(filter);
   //specify base classifier
   fc.setClassifier(tree);
-  //Build the meta-classifier
+//  //Build the meta-classifier
   fc.buildClassifier(dataset);
 
-  System.out.println(tree.graph());
-  System.out.println(tree);
+//  System.out.println(tree.graph());
+//  System.out.println(tree);
   
-  weka.core.SerializationHelper.write(modelPath + "/trainedModel/J48_Page.model", fc);
+  weka.core.SerializationHelper.write(modelPath + "/J48_Page.model", fc);
 
-//  double pred = tree.classifyInstance("tree");
+  //  double pred = tree.classifyInstance("tree");
   //System.out.println("====== RESULT ====== \tCLASSIFIED AS:\t" + );
  }
 }
