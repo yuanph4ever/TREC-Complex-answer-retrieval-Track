@@ -112,13 +112,33 @@ At each node of the tree, J48 chooses the attribute of the data that most effect
 
 Random Forest are an ensemble learning method for classification, regression and other tasks, that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classification) or mean prediction (regression) of the individual trees. Random decision forests correct for decision trees' habit of overfitting to their training set.
 
-# Learn to Rank
+# 9.Learn to Rank
 
 1. Use makeRanklibFile.py to generate feature files for training data and test data. 
 2. Use Ranklib to train the feature file for training data and generate the model file.
 3. Use the model file to rank the feature file of test data and get the score file.
 4. Use reRankByML.py to generate the run file by using the score file.
 (You can find those python scripts in ./pyScript)
+
+# 10.Re-rank by TagMe Type
+
+1)A search method was implemented, “BM25” similarity of “lucene” was used to compute similarity between query and paragraph to generate a baseline run file. 
+2) The paragraph IDs of the baseline run file were compared with the “dedup.articles-paragraphs.cbor” to get the text content. 
+3) For each paragraph ID, entities and its respective type was gathered using TagMe. 
+4) The frequency of TagMe type was clustered for each paragraph ID in the run file. 
+5) The run file was then re-ranked as per the descending order of the frequency of type in a paragraph given a query.
+
+# 11.Re-Rank by TagMe Type and BM25 similarity with weight
+
+1)A search method was implemented, ” BM25” similarity of “lucene” was used to compute similarity between query and paragraph to generate a baseline run file. 
+2) The paragraph IDs of the baseline run file were compared with the “dedup.articles-paragraphs.cbor” to get the text content. 
+3) For each paragraph ID, entities and its respective type was gathered using TagMe.
+4) The frequency of TagMe type was clustered for each paragraph ID in the run file. 
+5) The run file was then re-ranked as per the descending order of the frequency of type in a paragraph given a query. 
+6) The run file generated was further processed to get a better score were both the rank and BM25 score could be used to get an appropriate ranking. New score = BM25 similarity score + 1/(Rank of the para id as per frequency of type) 
+7) The New score was then used to re-rank the run file.
+This method was implemented for top 100 paragraph IDs for below three run file (section, Lowest_heading_Section, CK_Section )
+
 
 
 
