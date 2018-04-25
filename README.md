@@ -27,7 +27,7 @@ types_clu_index_Dir: the directory which stores the index file for clusters of t
 # Path on server
 1. arg[0] - one of the following 
    "-exp", "-kmeansClu", "-typesClu", "-classify"
-2. The path for lucene index args[2] - /home/ns1077/ParagraphIndexPr2/
+2. The path for lucene index args[2] - /home/ns1077/Prototype3/ParagraphIndexPr2/
 3. The path for lucene index args[4] - /home/py1004/project/Index_kmeans_cluster
 4. The path for lucene index args[5] - /home/py1004/project/Index_DBpedia_Entities
 
@@ -38,11 +38,10 @@ When the program is running, you can see messages from console. The messages ind
 
 When the program is done, you can see a message like "All works DONE. Generate [number of runfiles] runfiles in [output folder you specified]" from console.
 
-# Outputs
+# Test Results
 
-For your convience, we stored all the outputs for test data for you to evaluate. They are stored here
-
-TREC-Complex-answer-retrieval-Track/Output/Runfiles_testData
+The three test runs from our team are in the Path below in the server.
+/home/ns1077/benchmarkY1TestRuns
 
 # Methods Description
 
