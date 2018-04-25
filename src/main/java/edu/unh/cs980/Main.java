@@ -146,8 +146,7 @@ public class Main {
 			}
 			else
 			{
-				ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,
-						"kmeanssection");
+				//ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,"kmeanssection");
 			}
 			
 			/**********************************************************************************************************/
