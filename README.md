@@ -112,7 +112,7 @@ At each node of the tree, J48 chooses the attribute of the data that most effect
 
 Random Forest are an ensemble learning method for classification, regression and other tasks, that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classification) or mean prediction (regression) of the individual trees. Random decision forests correct for decision trees' habit of overfitting to their training set.
 
-#Learn to Rank
+# Learn to Rank
 
 1. Use makeRanklibFile.py to generate feature files for training data and test data. 
 2. Use Ranklib to train the feature file for training data and generate the model file.
