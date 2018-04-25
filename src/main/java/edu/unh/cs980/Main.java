@@ -131,7 +131,7 @@ public class Main {
 			/**********************************************************************************************************/
 
 			System.out.println("======================= Classifying BM25 Set =====================================");
-			Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
+			//Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
 
 			
 
