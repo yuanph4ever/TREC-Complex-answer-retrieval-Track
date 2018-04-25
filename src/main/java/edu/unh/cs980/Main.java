@@ -24,36 +24,38 @@ public class Main {
 
 	private static void usage() {
 		System.out.println(
-				"Command line parameters:Method_Signal Outline_Cbor Lucene_INDEX Output_Dir *kmeans_clu_index_Dir/types_clu_index_Dir");
-		System.out.println("Methods_Signal: ");
-		System.out.println("  -exp: query expansion with entities");
-		System.out.println("  -kmeansClu: query by using kmeans clusters");
-		System.out.println("  -typesClu: query by using types clusters");
+				"Command line parameters:Method_Signal outputDirectory");
+//		System.out.println("Methods_Signal: ");
+//		System.out.println("  -exp: query expansion with entities");
+//		System.out.println("  -kmeansClu: query by using kmeans clusters");
+//		System.out.println("  -typesClu: query by using types clusters");
 		System.exit(-1);
 	}
 
 	public static void main(String[] args) throws Exception {
 
-		if (args.length < 4)
+		if (args.length < 2)
 			usage();
 
 		System.setProperty("file.encoding", "UTF-8");
 
 		String method_signal = args[0];
-		String pagesFile = args[1];
-		String indexPath = args[2];
-		String outputPath = args[3];
-		String clu_index = "";
+		String outputPath = args[1];
+		
+		String pagesFile = "/home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor";
+		String indexPath = "/home/ns1077/Prototype3/ParagraphIndexPr2/";
+		
+		
 
-		if (args.length == 5) {
-
-			if (method_signal.equals("-kmeansClu") || method_signal.equals("-typesClu")) {
-				clu_index = args[4];
-			} else {
-				usage();
-			}
-
-		}
+//		if (args.length == 5) {
+//
+//			if (method_signal.equals("-kmeansClu") || method_signal.equals("-typesClu")) {
+//				clu_index = args[4];
+//			} else {
+//				usage();
+//			}
+//
+//		}
 
 		int num_of_runfile = 0;
 
@@ -86,6 +88,7 @@ public class Main {
 		 * Query by using kmeans clusters
 		 */
 		else if (method_signal.equals("-kmeansClu")) {
+			String clu_index = "/home/py1004/project/Index_kmeans_cluster";
 			System.out.println("Start Query by K-means Cluster");
 			QueryByCluster qbk = new QueryByCluster("page", pagesFile, indexPath, "-k", clu_index, outputPath);
 			num_of_runfile++;
@@ -107,8 +110,9 @@ public class Main {
 		 * Query by using types clusters
 		 */
 		else if (method_signal.equals("-typesClu")) {
+			String typesClu = "/home/py1004/project/Index_DBpedia_Entities";
 			System.out.println("Start Query by Types Cluster");
-			QueryByCluster qbc = new QueryByCluster("section", pagesFile, indexPath, "-c", clu_index, outputPath);
+			QueryByCluster qbc = new QueryByCluster("section", pagesFile, indexPath, "-c", typesClu, outputPath);
 			num_of_runfile++;
 			System.out.println("Query by Types Cluster DONE");
 		}
@@ -126,12 +130,12 @@ public class Main {
 			/**********************************************************************************************************/
 
 			System.out.println("======================= BaseLine Candidate set=====================================");
-			//BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
+			BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
 
 			/**********************************************************************************************************/
 
 			System.out.println("======================= Classifying BM25 Set =====================================");
-			//Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
+			Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
 
 			
 
@@ -146,7 +150,7 @@ public class Main {
 			}
 			else
 			{
-				//ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,"kmeanssection");
+				ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,"kmeanssection");
 			}
 			
 			/**********************************************************************************************************/
