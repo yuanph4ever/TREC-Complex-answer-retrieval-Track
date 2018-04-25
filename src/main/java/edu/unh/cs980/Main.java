@@ -126,12 +126,12 @@ public class Main {
 			/**********************************************************************************************************/
 
 			System.out.println("======================= BaseLine Candidate set=====================================");
-			//BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
+			BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
 
 			/**********************************************************************************************************/
 
 			System.out.println("======================= Classifying BM25 Set =====================================");
-			//Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
+			Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
 
 			
 
