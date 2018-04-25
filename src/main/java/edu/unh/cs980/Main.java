@@ -136,10 +136,19 @@ public class Main {
 			
 
 			/******************************************** Classify K-means ********************************************/
+			
 			System.out.println("Classifiying Kmeans Resuslt");
 			String kmeansRunFile = outputPath + "/train_runfile_section_cluster_kmeans_20k";
-			ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,
-					"kmeanssection");
+			File isFileExist = new File(kmeansRunFile);
+			if(!isFileExist.exists())
+			{
+				System.out.println("Kmeans output doesnot exist - moving to classifying candidate set");
+			}
+			else
+			{
+				ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,
+						"kmeanssection");
+			}
 			
 			/**********************************************************************************************************/
 
