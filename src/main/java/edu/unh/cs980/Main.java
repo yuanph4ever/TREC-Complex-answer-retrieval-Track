@@ -1,6 +1,7 @@
 
 package edu.unh.cs980;
 
+import java.io.File;
 import java.io.FileInputStream;
 
 import java.io.IOException;
@@ -42,6 +43,14 @@ public class Main {
 
 		int num_of_runfile = 0;
 
+		// Make directory if one does'nt exist.......
+		String directoryName = outputPath;
+		File directory = new File(directoryName);
+		if(!directory.exists())
+			directory.mkdirs();
+		
+		outputPath = directory.getPath();
+		
 		System.out.println("Get method signal: " + method_signal);
 		System.out.println("Start searching and generating runfiles...");
 
