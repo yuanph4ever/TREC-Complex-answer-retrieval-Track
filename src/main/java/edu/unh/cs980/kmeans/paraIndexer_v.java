@@ -1,8 +1,12 @@
 package edu.unh.cs980.kmeans;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -91,5 +95,36 @@ public class paraIndexer_v {
 	        doc.add(new StringField("paragraphid", p.getParaId(), Field.Store.YES));  // don't tokenize this!   
 	        return doc;
 	    }
+		
+		private static String getHttpResponse(String urlStr) {
+			try {
+
+				URL url = new URL(urlStr);
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				conn.setRequestMethod("GET");
+
+				conn.setRequestProperty("Accept", "application/json");
+				// conn.setReadTimeout(httpRequest_timeout);
+				if (conn.getResponseCode() != 200) {
+					System.out.println("Failed to connect to " + urlStr + " with HTTP error code: " + conn.getResponseCode());
+					if (conn.getResponseCode() == 401) {
+					}
+					return null;
+				}
+
+				BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+				String output = "";// br.readLine();
+				String line = "";
+				while ((line = br.readLine()) != null) {
+					output += line;
+				}
+
+				conn.disconnect();
+				return output;
+			} catch (Exception e) {
+				return null;
+			}
+		}
 
 }

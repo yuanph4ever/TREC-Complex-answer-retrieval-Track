@@ -24,8 +24,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -35,8 +37,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,22 +60,13 @@ public class QueryExpansionWithEntities {
 	
 	static String spotlightAPIurl = "http://model.dbpedia-spotlight.org/en/annotate?";
 	
-	public QueryExpansionWithEntities(String page_file, String index_Dir, String output_Dir, int top) throws IOException{
+	public QueryExpansionWithEntities(String action, String page_file, String index_Dir, String output_Dir, int top) throws IOException{
 		
 		System.setProperty("file.encoding", "UTF-8");
-
-		/*
-        if (args.length < 3)
-            usage();
-
-        final String pagesFile = args[0];
-        final String indexPath = args[1];
-        final String output = args[2] + "/runfile_query_expansion";
-        */
 		
 		final String pagesFile = page_file;
         final String indexPath = index_Dir;
-        final String output = output_Dir + "/runfile_query_expansion_" + top;
+        final String output = output_Dir + "/test_runfile_query_expansion_" + action + "_" + top;
         
         File runfile = new File(output);
 		runfile.createNewFile();
@@ -82,58 +77,129 @@ public class QueryExpansionWithEntities {
         final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
 
         final FileInputStream fileInputStream = new FileInputStream(new File(pagesFile));
-        for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
-        	
-            final String queryId = page.getPageId();
-            String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
-            //System.out.println("Initial query: " + queryStr);
-            
-            //---First Round Query---
-            TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), top);
-            ScoreDoc[] scoreDoc = tops.scoreDocs;
-            String expStr = ""; 
-            for (int i = 0; i < scoreDoc.length; i++) {
-                ScoreDoc score = scoreDoc[i];
-                final Document doc = searcher.doc(score.doc); // to access stored content
-                // print score and internal docid
-                final String para_text = doc.getField("text").stringValue();
-                //System.out.println(para_text);
-                String httpUrl = spotlightAPIurl + "text=" + para_text.replaceAll("[^A-Za-z0-9]", "%20");
-    				String responseStr = getHttpResponse(httpUrl);
-    				Pattern pattern = Pattern.compile("http://dbpedia.org/resource/(.*?)\",\"@support");
-    				Matcher matcher = pattern.matcher(responseStr);
-    				while (matcher.find()) {	
-    					//System.out.println(matcher.group(1));
-    					//System.out.println(matcher.group(1).replaceAll("[^A-Za-z0-9]", ""));
-    					expStr += " " + matcher.group(1);
-    				}   
-            }
-            
-            String newExpQuery = getUniqueStr(queryStr + expStr);
-            newExpQuery = newExpQuery.replaceAll("[^a-zA-Z0-9]", " ");
-            //System.out.println("Expanded Query: " + newExpQuery);
-            //newExpQuery = queryStr;
-            
-            //---Second Round Query---
-            tops = searcher.search(queryBuilder.toQuery(newExpQuery), 100);
-            scoreDoc = tops.scoreDocs;
-            for (int i = 0; i < scoreDoc.length; i++) {
-                ScoreDoc score = scoreDoc[i];
-                final Document doc = searcher.doc(score.doc); // to access stored content
-                final String paragraphid = doc.getField("paragraphid").stringValue();
-                final float searchScore = score.score;
-                final int searchRank = i+1;
-
-                //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
-                //System.out.println(".");
-                writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25\n");
-                
-            }
-			
-        }
         
+        int num_of_query = 0;
+        
+        if(action.equals("page")) {
+        	
+            for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
+            	
+            		System.out.println(".");
+            	
+                final String queryId = page.getPageId();
+                String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
+                //System.out.println("Initial query: " + queryStr);
+                
+                //---First Round Query---
+                TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), top);
+                ScoreDoc[] scoreDoc = tops.scoreDocs;
+                String expStr = ""; 
+                for (int i = 0; i < scoreDoc.length; i++) {
+                    ScoreDoc score = scoreDoc[i];
+                    final Document doc = searcher.doc(score.doc); // to access stored content
+                    // print score and internal docid
+                    final String para_text = doc.getField("text").stringValue();
+                    //System.out.println(para_text);
+                    String httpUrl = spotlightAPIurl + "text=" + para_text.replaceAll("[^A-Za-z0-9]", "%20");
+        				String responseStr = getHttpResponse(httpUrl);
+        				Pattern pattern = Pattern.compile("http://dbpedia.org/resource/(.*?)\",\"@support");
+        				Matcher matcher = pattern.matcher(responseStr);
+        				while (matcher.find()) {	
+        					//System.out.println(matcher.group(1));
+        					//System.out.println(matcher.group(1).replaceAll("[^A-Za-z0-9]", ""));
+        					expStr += " " + matcher.group(1);
+        				}   
+                }
+                
+                String newExpQuery = getUniqueStr(queryStr + expStr);
+                newExpQuery = newExpQuery.replaceAll("[^a-zA-Z0-9]", " ");
+                //System.out.println("Expanded Query: " + newExpQuery);
+                //newExpQuery = queryStr;
+                
+                //---Second Round Query---
+                tops = searcher.search(queryBuilder.toQuery(newExpQuery), 100);
+                scoreDoc = tops.scoreDocs;
+                for (int i = 0; i < scoreDoc.length; i++) {
+                    ScoreDoc score = scoreDoc[i];
+                    final Document doc = searcher.doc(score.doc); // to access stored content
+                    final String paragraphid = doc.getField("paragraphid").stringValue();
+                    final float searchScore = score.score;
+                    final int searchRank = i+1;
+
+                    //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
+                    //System.out.println(".");
+                    writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25\n");
+                    
+                }
+    			
+            }
+        	    	
+        }else if(action.equals("section")) {
+        	
+        	for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
+                for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
+                	
+                		System.out.println("Query Expansion by Top " + top + ": processing query no." + (1 + num_of_query));
+                	
+                    final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
+                    String queryStr = buildSectionQueryStr(page, sectionPath);
+
+                    //---First Round Query---
+                    TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), top);
+                    ScoreDoc[] scoreDoc = tops.scoreDocs;
+                    String expStr = ""; 
+                    for (int i = 0; i < scoreDoc.length; i++) {
+                        ScoreDoc score = scoreDoc[i];
+                        final Document doc = searcher.doc(score.doc); // to access stored content
+                        // print score and internal docid
+                        final String para_text = doc.getField("text").stringValue();
+                        System.out.println(para_text);
+                        String httpUrl = spotlightAPIurl + "text=" + para_text.replaceAll("[^A-Za-z0-9]", "%20");
+            				String responseStr = getHttpResponse(httpUrl);
+            				Pattern pattern = Pattern.compile("http://dbpedia.org/resource/(.*?)\",\"@support");
+            				Matcher matcher = pattern.matcher(responseStr);
+            				while (matcher.find()) {	
+            					//System.out.println(matcher.group(1));
+            					//System.out.println(matcher.group(1).replaceAll("[^A-Za-z0-9]", ""));
+            					expStr += " " + matcher.group(1);
+            				}   
+                    }
+                    
+                    String newExpQuery = getUniqueStr(queryStr + expStr);
+                    newExpQuery = newExpQuery.replaceAll("[^a-zA-Z0-9]", " ");
+                    //System.out.println("Expanded Query: " + newExpQuery);
+                    //newExpQuery = queryStr;
+                    
+                    //---Second Round Query---
+                    tops = searcher.search(queryBuilder.toQuery(newExpQuery), 100);
+                    scoreDoc = tops.scoreDocs;
+                    for (int i = 0; i < scoreDoc.length; i++) {
+                        ScoreDoc score = scoreDoc[i];
+                        final Document doc = searcher.doc(score.doc); // to access stored content
+                        final String paragraphid = doc.getField("paragraphid").stringValue();
+                        final float searchScore = score.score;
+                        final int searchRank = i+1;
+
+                        //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
+                        //System.out.println(".");
+                        writer.write(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25\n");
+                        
+                    }
+                    
+                    num_of_query ++;
+
+                }
+            }
+        		
+        }else {
+        		System.out.println("invalid action\naction is either [page] or [section]");
+        		System.exit(0);
+        }
+ 
         writer.flush();//why flush?
 		writer.close();
+		
+		stripDuplicatesFromFile(output);
 		
 		System.out.println("Query Expansion with Top " + top + " Entities Done!");
 		
@@ -234,6 +300,25 @@ public class QueryExpansionWithEntities {
 				return null;
 			}
 		}
+		
+		// Remove Duplicates from the runfile for sections
+				public static void stripDuplicatesFromFile(String filename) throws IOException {
+					BufferedReader reader = new BufferedReader(new FileReader(filename));
+					Set<String> lines = new HashSet<String>(); // maybe should be bigger
+					String line;
+					while ((line = reader.readLine()) != null) {
+						lines.add(line);
+					}
+					reader.close();
+					System.out.println("Removing Duplicates");
+					BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+					for (String unique : lines) {
+						writer.write(unique);
+						writer.newLine();
+					}
+					writer.close();
+					System.out.println("Duplicates Removed");
+				}
 	
 
 }

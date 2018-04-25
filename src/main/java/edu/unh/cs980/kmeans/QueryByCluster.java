@@ -54,29 +54,15 @@ import java.util.regex.Pattern;
 
 public class QueryByCluster {
 	
-	private static void usage() {
-        System.out.println("Command line parameters: OutlineCBOR corpus_INDEX -k/-c cluster_INDEX Output_Dir");
-        System.exit(-1);
-    }
-	
 	/*
-	 * will be used for classifier
+	 * the MAP will be used for classifier
 	*/
 	private static Map<String, List<String>> pageid_with_para_text = new HashMap<String, List<String>>();
 	
-	public QueryByCluster(String outline_cbor, String corpus_index, String type_of_clu, String clu_index, String output_Dir) throws IOException{
+	public QueryByCluster(String action, String outline_cbor, String corpus_index, String type_of_clu, String clu_index, String output_Dir) throws IOException{
 		
-		/*
-		if (args.length < 4)
-            usage();
 		
-		String pagesFile = args[0];
-		String corpusPath = args[1];
-		String flag = args[2];
-        String clustersPath = args[3];
-        String outputPath = args[4];
-        */
-		
+		String act = action;
 		String pagesFile = outline_cbor;
 		String corpusPath = corpus_index;
 		String flag = type_of_clu;
@@ -87,10 +73,10 @@ public class QueryByCluster {
         File runfile;
 		
         if(flag == "-c") {
-        		outputfile = outputPath + "/runfile_pages_cluster_types";
+        		outputfile = outputPath + "/runfile_cluster_types_" + action;
         		runfile = new File(outputfile);
         }else {
-        		outputfile = outputPath + "/runfile_pages_cluster_kmeans";
+        		outputfile = outputPath + "/runfile_cluster_kmeans_" + action;
         		runfile = new File(outputfile);
         }
     		
@@ -103,108 +89,111 @@ public class QueryByCluster {
         final MyQueryBuilder queryBuilder = new MyQueryBuilder(new StandardAnalyzer());
         final FileInputStream fileInputStream = new FileInputStream(new File(pagesFile));
         
-        System.out.println("starting searching for pages with using clusters...");
-        
         int num_of_query = 0;
         
         int num_of_reRank = 0;
         
-        /*
-        
-        for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
-            for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
-        		//"classifier" use
-        		List<String> para_list = new ArrayList<String>();
+        if(act.equals("section")) {
         	
-        		//System.out.println(".");
+        		System.out.println("start searching for sections by using clusters...");
         	
-        		final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
+            for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
+                for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
+            		//"classifier" use
+            		List<String> para_list = new ArrayList<String>();
+            	
+            		System.out.println("processing query no." + (num_of_query + 1));
+            	
+            		final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 
-            String queryStr = buildSectionQueryStr(page, sectionPath);
-            
-            String[] query_clu_rank = getCluRankforStr(queryStr, clustersPath);
-            
-            TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
-            ScoreDoc[] scoreDoc = tops.scoreDocs;
-            if(!isAllNull(query_clu_rank)) {
-            		//do re_rank
-            		Map<String, Float> runfile_map = new HashMap<String, Float>();
-            		//map para_id to para_content for "classifier" use
-            		Map<String, String> para_map = new HashMap<String, String>();
-            		for (int i = 0; i < scoreDoc.length; i++) {
+                String queryStr = buildSectionQueryStr(page, sectionPath);
+                
+                String[] query_clu_rank = getCluRankforStr(queryStr, clustersPath);
+                
+                TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
+                ScoreDoc[] scoreDoc = tops.scoreDocs;
+                if(!isAllNull(query_clu_rank)) {
+                		//do re_rank
+                		Map<String, Float> runfile_map = new HashMap<String, Float>();
+                		//map para_id to para_content for "classifier" use
+                		Map<String, String> para_map = new HashMap<String, String>();
+                		for (int i = 0; i < scoreDoc.length; i++) {
+                            ScoreDoc score = scoreDoc[i];
+                            final Document doc = searcher.doc(score.doc); // to access stored content
+                            // print score and internal docid
+                            final String paragraphid = doc.getField("paragraphid").stringValue();
+                            final String para_text = doc.getField("text").stringValue();
+                            para_map.put(paragraphid, para_text);
+                            final float searchScore = score.score;
+                            //final int searchRank = i+1;
+                            String para_indicator;
+                            if(flag == "-c") {
+                            		para_indicator = getDBEntities(para_text);               
+                            }else {
+                            		para_indicator = para_text;
+                            }
+                            String[] para_clu_rank = getCluRankforStr(para_indicator, clustersPath);
+                            //printArray(para_clu_rank);
+                            final float newScore = getScore(searchScore, query_clu_rank, para_clu_rank);
+                            //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
+                            //System.out.println(i);
+                            runfile_map.put(paragraphid, newScore);
+                    }
+                		//System.out.println(para_map);
+                		runfile_map = sortByComparator(runfile_map, false);
+                		//printMap(runfile_map);
+                		int searchRank = 0;
+                		for (Map.Entry<String, Float> entry : runfile_map.entrySet()) {
+                			  searchRank ++;
+              			  String key = entry.getKey();
+              			  float value = entry.getValue();
+              			  //System.out.println("key is " + key + "; value is " + value);
+              			  writer.write(queryId + " Q0 " + key + " " + searchRank + " " + value + " Lucene-BM25\n");  
+              			  //for "classifier" use
+              			  String para_content = para_map.get(key);
+              			  //System.out.println("para content is " + para_content);
+              			  para_list.add(para_content);
+              		}
+                		//System.out.println("tag 1 : " + para_list);
+                		num_of_reRank ++;
+                }else {
+                	    //without re_rank
+                		for (int i = 0; i < scoreDoc.length; i++) {
                         ScoreDoc score = scoreDoc[i];
                         final Document doc = searcher.doc(score.doc); // to access stored content
-                        // print score and internal docid
                         final String paragraphid = doc.getField("paragraphid").stringValue();
                         final String para_text = doc.getField("text").stringValue();
-                        para_map.put(paragraphid, para_text);
                         final float searchScore = score.score;
-                        //final int searchRank = i+1;
-                        String para_indicator;
-                        if(flag == "-c") {
-                        		para_indicator = getDBEntities(para_text);               
-                        }else {
-                        		para_indicator = para_text;
-                        }
-                        String[] para_clu_rank = getCluRankforStr(para_indicator, clustersPath);
-                        //printArray(para_clu_rank);
-                        final float newScore = getScore(searchScore, query_clu_rank, para_clu_rank);
+                        final int searchRank = i+1;
                         //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
-                        //System.out.println(i);
-                        runfile_map.put(paragraphid, newScore);
+                        //System.out.println(".");
+                        writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
+                        //for "classifier" use
+        			  		para_list.add(para_text);
+                		}
+                		//System.out.println("tag 2 : " + para_list);
+                	
                 }
-            		//System.out.println(para_map);
-            		runfile_map = sortByComparator(runfile_map, false);
-            		//printMap(runfile_map);
-            		int searchRank = 0;
-            		for (Map.Entry<String, Float> entry : runfile_map.entrySet()) {
-            			  searchRank ++;
-          			  String key = entry.getKey();
-          			  float value = entry.getValue();
-          			  //System.out.println("key is " + key + "; value is " + value);
-          			  writer.write(queryId + " Q0 " + key + " " + searchRank + " " + value + " Lucene-BM25\n");  
-          			  //for "classifier" use
-          			  String para_content = para_map.get(key);
-          			  //System.out.println("para content is " + para_content);
-          			  para_list.add(para_content);
-          		}
-            		//System.out.println("tag 1 : " + para_list);
-            		num_of_reRank ++;
-            }else {
-            	    //without re_rank
-            		for (int i = 0; i < scoreDoc.length; i++) {
-                    ScoreDoc score = scoreDoc[i];
-                    final Document doc = searcher.doc(score.doc); // to access stored content
-                    final String paragraphid = doc.getField("paragraphid").stringValue();
-                    final String para_text = doc.getField("text").stringValue();
-                    final float searchScore = score.score;
-                    final int searchRank = i+1;
-                    //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
-                    //System.out.println(".");
-                    writer.write(queryId + " Q0 " + paragraphid + " " + searchRank + " " + searchScore + " Lucene-BM25\n");
-                    //for "classifier" use
-    			  		para_list.add(para_text);
-            		}
-            		//System.out.println("tag 2 : " + para_list);
-            	
-            }
-            
-            pageid_with_para_text.put(queryId, para_list);
-            
-            num_of_query ++;
+                
+                pageid_with_para_text.put(queryId, para_list);
+                
+                num_of_query ++;
 
-        
+            
+                }
             }
-        }
-        
-        */
-        
-        for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
         	
+        	
+        }else if(act.equals("page")){
+        	
+        	System.out.println("start searching for pages by using clusters...");
+        	
+        	for (Data.Page page : DeserializeData.iterableAnnotations(fileInputStream)) {
+            	
         		//"classifier" use
         		List<String> para_list = new ArrayList<String>();
         	
-        		//System.out.println(".");
+        		System.out.println("processing query no." + (num_of_query + 1));
         	
             final String queryId = page.getPageId();
 
@@ -237,12 +226,23 @@ public class QueryByCluster {
                         String[] para_clu_rank = getCluRankforStr(para_indicator, clustersPath);
                         //printArray(para_clu_rank);
                         final float newScore = getScore(searchScore, query_clu_rank, para_clu_rank);
+                        
+                        if(searchScore != newScore) {
+                        		//System.out.println("re_score for " + paragraphid);
+                        		//System.out.println("old score is " + searchScore + " new score is " + newScore);
+                        		break;
+                        }else {
+                        		//System.out.println("newScore = oldScore");
+                        }
+                        
                         //System.out.println(queryId+" Q0 "+paragraphid+" "+searchRank + " "+searchScore+" Lucene-BM25");
                         //System.out.println(i);
                         runfile_map.put(paragraphid, newScore);
                 }
-            		//System.out.println(para_map);
+            		//System.out.println("old map is");
+            		//printMap(runfile_map);
             		runfile_map = sortByComparator(runfile_map, false);
+            		//System.out.println("new map is");
             		//printMap(runfile_map);
             		int searchRank = 0;
             		for (Map.Entry<String, Float> entry : runfile_map.entrySet()) {
@@ -256,6 +256,7 @@ public class QueryByCluster {
           			  //System.out.println("para content is " + para_content);
           			  para_list.add(para_content);
           		}
+            		
             		//System.out.println("tag 1 : " + para_list);
             		num_of_reRank ++;
             }else {
@@ -282,11 +283,25 @@ public class QueryByCluster {
             num_of_query ++;
 
         }
+        	
+        		
+        	
+        }else {
+        	
+        		System.out.println("invalid action\naction is either [page] or [section]");
+        		System.exit(0);
+        }
         
+        /*
+         * section query takes much long time than page query
+         */
+        
+        
+                
         		writer.flush();//why flush?
 			writer.close();
 			
-			//stripDuplicatesFromFile(outputfile);
+			stripDuplicatesFromFile(outputfile);
 			
 			System.out.println("Number of query is " + num_of_query);
 			System.out.println("Number of re_ranked query is " + num_of_reRank);
@@ -357,6 +372,10 @@ public class QueryByCluster {
 	}
 	
 	private static float getScore(float score, String[] query_clu_rank, String[] para_clu_rank) {
+		//System.out.println("query_clu_rank is ");
+		//printArray(query_clu_rank);
+		//System.out.println("para_clu_rank is ");
+		//printArray(para_clu_rank);
 		float s = 0;
 		String para_clu = para_clu_rank[0];
 		if(para_clu != null) {
@@ -368,7 +387,11 @@ public class QueryByCluster {
 				}
 			}
 			if(p != 0){
-				s = 10/p;
+				s = 1/p;
+				//System.out.println("plus score : " + s);
+			}else {
+				s = -(score/2);
+				//System.out.println("minus score : " + s);
 			}
 		}
 		return s + score;

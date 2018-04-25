@@ -97,6 +97,12 @@
 			<artifactId>org.json</artifactId>
 			<version>chargebee-1.0</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>3.9.1</version>
+		</dependency>
 
 
 	</dependencies>
