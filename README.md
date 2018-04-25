@@ -9,7 +9,7 @@
 
 3. Then an executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the command line 
 
-java -jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir
+java -jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir (or types_clu_index_Dir)
 
 # Arguments Description
 Methods_Signal: you want to put "-exp" which indicates run "Pseudo Relevance Feedback with Entities" and this will give you five runfiles in output path; "-kmeansClu" for "Re-Rank by K-means Clustering" to give you one runfile; "-typesClu" for "Re-rank by Category Clustering" to give you one run file; "-classify" for "Classifcation using J48 Classifier" gives you three run file;
@@ -28,8 +28,8 @@ types_clu_index_Dir: the directory which stores the index file for clusters of t
 1. arg[0] - one of the following 
    "-exp", "-kmeansClu", "-typesClu", "-classify"
 2. The path for lucene index args[2] - /home/ns1077/Prototype3/ParagraphIndexPr2/
-3. The path for lucene index args[4] - /home/py1004/project/Index_kmeans_cluster
-4. The path for lucene index args[5] - /home/py1004/project/Index_DBpedia_Entities
+3. The path for "kmeans cluster" index args[4] - /home/py1004/project/Index_kmeans_cluster
+4. The path for "entities cluster" index args[4] - /home/py1004/project/Index_DBpedia_Entities
 
 # An-Example-Run
 java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar -classify /home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor /home/ns1077/ParagraphIndexPr2/ /home/ns1077/Runfile/ "/home/py1004/project/Index_kmeans_cluster" "/home/py1004/project/Index_DBpedia_Entities"
