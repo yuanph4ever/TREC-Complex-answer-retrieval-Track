@@ -54,7 +54,7 @@ public class ReadRunFileAndClassify {
 		System.out.println("=========================== Using Saved Model ===============================");
 		System.out.println(" load Model J48");
 		Classifier cls_J48 = (Classifier) weka.core.SerializationHelper.read(model_J48);
-		classifyUsingSavedModelFromRunFile(File, indexPath, cls_J48, "J48", outputPath, type);
+		//classifyUsingSavedModelFromRunFile(File, indexPath, cls_J48, "J48", outputPath, type);
 		System.out.println("Model loaded successfully");
 
 		System.out.println(" load Model Random Forest");
@@ -64,7 +64,7 @@ public class ReadRunFileAndClassify {
 
 		System.out.println("load Model NaiveBayes");
 		Classifier cls_NB = (Classifier) weka.core.SerializationHelper.read(model_NB);
-		classifyUsingSavedModelFromRunFile(File, indexPath, cls_RF, "NaiveBayes", outputPath, type);
+		//classifyUsingSavedModelFromRunFile(File, indexPath, cls_RF, "NaiveBayes", outputPath, type);
 		System.out.println("Model loaded successfully");
 		
 		
@@ -101,6 +101,8 @@ public class ReadRunFileAndClassify {
 		if (type == "section")
 			outputPath = outputPath + "/" + classifierName + "_Section_NewCandidate";
 
+		if (type == "kmeanssection")
+			outputPath = outputPath + "/" + classifierName + "KMEANS_Section";
 		// outputPath = outputPath + "/" + classifierName;
 		File runfile = new File(outputPath + "Laurarunfile_Pr3");
 		runfile.createNewFile();

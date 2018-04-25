@@ -18,19 +18,19 @@ import edu.unh.cs980.entitiesExpansion.QueryExpansionWithEntities;
 import edu.unh.cs980.kmeans.QueryByCluster;
 import weka.classifiers.Classifier;
 
-import java.time.Clock; 
+import java.time.Clock;
 
 public class Main {
 
 	private static void usage() {
-        System.out.println("Command line parameters:Method_Signal Outline_Cbor Lucene_INDEX Output_Dir *kmeans_clu_index_Dir/types_clu_index_Dir");
-        System.out.println("Methods_Signal: ");
-        System.out.println("  -exp: query expansion with entities");
-        System.out.println("  -kmeansClu: query by using kmeans clusters");
-        System.out.println("  -typesClu: query by using types clusters");
-        System.exit(-1);
-    }
-
+		System.out.println(
+				"Command line parameters:Method_Signal Outline_Cbor Lucene_INDEX Output_Dir *kmeans_clu_index_Dir/types_clu_index_Dir");
+		System.out.println("Methods_Signal: ");
+		System.out.println("  -exp: query expansion with entities");
+		System.out.println("  -kmeansClu: query by using kmeans clusters");
+		System.out.println("  -typesClu: query by using types clusters");
+		System.exit(-1);
+	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -44,28 +44,27 @@ public class Main {
 		String indexPath = args[2];
 		String outputPath = args[3];
 		String clu_index = "";
-		
-		if( args.length == 5 ) {
-			
-			if( method_signal.equals("-kmeansClu") || method_signal.equals("-typesClu") ) {
+
+		if (args.length == 5) {
+
+			if (method_signal.equals("-kmeansClu") || method_signal.equals("-typesClu")) {
 				clu_index = args[4];
-			}else {
+			} else {
 				usage();
 			}
-			
+
 		}
-		
-		
+
 		int num_of_runfile = 0;
 
 		// Make directory if one does'nt exist.......
 		String directoryName = outputPath;
 		File directory = new File(directoryName);
-		if(!directory.exists())
+		if (!directory.exists())
 			directory.mkdirs();
-		
+
 		outputPath = directory.getPath();
-		
+
 		System.out.println("Get method signal: " + method_signal);
 		System.out.println("Start searching and generating runfiles...");
 
@@ -74,10 +73,11 @@ public class Main {
 		 */
 		if (method_signal.equals("-exp")) {
 			System.out.println("Start Query Expansion with Entities");
-			for(int i = 1; i < 6; i ++) {
-				QueryExpansionWithEntities qewe = new QueryExpansionWithEntities("page", pagesFile, indexPath, outputPath, i);
+			for (int i = 1; i < 6; i++) {
+				QueryExpansionWithEntities qewe = new QueryExpansionWithEntities("page", pagesFile, indexPath,
+						outputPath, i);
 				System.out.println("Query Expansion with top " + i + " DONE");
-				num_of_runfile ++;	
+				num_of_runfile++;
 			}
 			System.out.println("Query Expansion with entities DONE");
 		}
@@ -88,7 +88,7 @@ public class Main {
 		else if (method_signal.equals("-kmeansClu")) {
 			System.out.println("Start Query by K-means Cluster");
 			QueryByCluster qbk = new QueryByCluster("page", pagesFile, indexPath, "-k", clu_index, outputPath);
-			num_of_runfile ++;
+			num_of_runfile++;
 			System.out.println("Query by K-means Cluster DONE");
 		}
 
@@ -109,15 +109,20 @@ public class Main {
 		else if (method_signal.equals("-typesClu")) {
 			System.out.println("Start Query by Types Cluster");
 			QueryByCluster qbc = new QueryByCluster("section", pagesFile, indexPath, "-c", clu_index, outputPath);
-			num_of_runfile ++;
+			num_of_runfile++;
 			System.out.println("Query by Types Cluster DONE");
 		}
 
-		
 		else if (method_signal.equals("-classify")) {
-			
-			
+
 			// Nithin - methods
+
+			// Train
+			String paraPageTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
+			String paraSectionTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
+			// Test
+			String paraPageTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
+			String paraSectionTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
 			/**********************************************************************************************************/
 
 			System.out.println("======================= BaseLine Candidate set=====================================");
@@ -128,14 +133,15 @@ public class Main {
 			System.out.println("======================= Classifying BM25 Set =====================================");
 			Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
 
-			/**********************************************************************************************************/
+			
 
-			// Train
-			String paraPageTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
-			String paraSectionTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
-			// Test
-			String paraPageTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
-			String paraSectionTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
+			/******************************************** Classify K-means ********************************************/
+			System.out.println("Classifiying Kmeans Resuslt");
+			String kmeansRunFile = outputPath + "/train_runfile_section_cluster_kmeans_20k";
+			ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,
+					"kmeanssection");
+			
+			/**********************************************************************************************************/
 
 			System.out.println("======================= Classifying Laura Candidate Set ===========================");
 			ReadRunFileAndClassify rrfc = new ReadRunFileAndClassify(paraPageTrain, indexPath, outputPath, "para");
@@ -151,12 +157,9 @@ public class Main {
 			usage();
 		}
 
-		
-		System.out.println("All works DONE. Generate " + num_of_runfile + " runfiles in " + outputPath);	
+		System.out.println("All works DONE. Generate " + num_of_runfile + " runfiles in " + outputPath);
 		System.out.println("All works DONE. Generate " + num_of_runfile + " runfiles in " + outputPath);
 
 	}
-
-	
 
 }
