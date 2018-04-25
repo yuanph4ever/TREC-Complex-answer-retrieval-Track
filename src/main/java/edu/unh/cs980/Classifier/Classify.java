@@ -145,7 +145,7 @@ public class Classify {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 500);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 			for (int i = 0; i < scoreDoc.length; i++) {
@@ -229,7 +229,7 @@ public class Classify {
 				uniquePara = new ArrayList<String>();
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 800);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {

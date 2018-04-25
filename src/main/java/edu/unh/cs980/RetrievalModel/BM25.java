@@ -115,7 +115,7 @@ public class BM25 {
 //				System.out.println(page.getSkeleton().toString());
 				String queryStr = buildHierarchialQuery(page);
 //				System.out.println(queryStr);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 200);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -166,7 +166,7 @@ public class BM25 {
 
 			String queryStr = buildSectionQueryStr(page, Collections.<Data.Section>emptyList());
 
-			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 1000);
+			TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 			ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 			for (int i = 0; i < scoreDoc.length; i++) {
@@ -218,7 +218,7 @@ public class BM25 {
 				final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
 				String queryStr = buildSectionQueryStr(page, sectionPath);
 				System.out.println(queryStr);
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 800);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 
 				for (int i = 0; i < scoreDoc.length; i++) {
@@ -275,7 +275,7 @@ public class BM25 {
 				String queryStr = buildSectionQueryStr(sectionPath); // get the
 																		// lowest
 																		// heading
-				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 300);
+				TopDocs tops = searcher.search(queryBuilder.toQuery(queryStr), 100);
 				ScoreDoc[] scoreDoc = tops.scoreDocs;
 				for (int i = 0; i < scoreDoc.length; i++) {
 					ScoreDoc score = scoreDoc[i];
