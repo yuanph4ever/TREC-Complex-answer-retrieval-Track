@@ -81,8 +81,8 @@ public class Classify {
 
 		System.out.println("Model loaded successfully");
 
-		classiyPageSearch(outputPath, indexPath, pagesFile, cls_RF, "RForest");
-		classifySectionSearch(outputPath, indexPath, pagesFile, cls_RF, "RForest");
+// 		classiyPageSearch(outputPath, indexPath, pagesFile, cls_RF, "RForest");
+// 		classifySectionSearch(outputPath, indexPath, pagesFile, cls_RF, "RForest");
 
 		System.out.println(
 				"classification results written to the file " + outputPath + "/" + "RForest" + "runfile_pagePr3");
