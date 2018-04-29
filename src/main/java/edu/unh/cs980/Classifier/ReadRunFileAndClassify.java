@@ -59,7 +59,7 @@ public class ReadRunFileAndClassify {
 
 		System.out.println(" load Model Random Forest");
 		Classifier cls_RF = (Classifier) weka.core.SerializationHelper.read(model_RF);
-		classifyUsingSavedModelFromRunFile(File, indexPath, cls_RF, "RForest", outputPath, type);
+		//classifyUsingSavedModelFromRunFile(File, indexPath, cls_RF, "RForest", outputPath, type);
 		System.out.println("Model loaded successfully");
 
 		System.out.println("load Model NaiveBayes");
