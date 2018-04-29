@@ -9,7 +9,7 @@
 
 3. Then an executable program called "ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar" can be found in "./target". Run the program using the command line 
 
-java -jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir types_clu_index_Dir
+java -jar Method_Signal Outline_Cbor Lucene_INDEX Output_Dir kmeans_clu_index_Dir (or types_clu_index_Dir)
 
 # Arguments Description
 Methods_Signal: you want to put "-exp" which indicates run "Pseudo Relevance Feedback with Entities" and this will give you five runfiles in output path; "-kmeansClu" for "Re-Rank by K-means Clustering" to give you one runfile; "-typesClu" for "Re-rank by Category Clustering" to give you one run file; "-classify" for "Classifcation using J48 Classifier" gives you three run file;
@@ -27,22 +27,21 @@ types_clu_index_Dir: the directory which stores the index file for clusters of t
 # Path on server
 1. arg[0] - one of the following 
    "-exp", "-kmeansClu", "-typesClu", "-classify"
-2. The path for lucene index args[2] - /home/ns1077/ParagraphIndexPr2/
-3. The path for lucene index args[4] - /home/py1004/project/Index_kmeans_cluster
-4. The path for lucene index args[5] - /home/py1004/project/Index_DBpedia_Entities
+2. The path for lucene index args[2] - /home/ns1077/Prototype3/ParagraphIndexPr2/
+3. The path for "kmeans cluster" index args[4] - /home/py1004/project/Index_kmeans_cluster
+4. The path for "entities cluster" index args[4] - /home/py1004/project/Index_DBpedia_Entities
 
 # An-Example-Run
-java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar -classify /home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor /home/ns1077/ParagraphIndexPr2/ /home/ns1077/Runfile/ "/home/py1004/project/Index_kmeans_cluster" "/home/py1004/project/Index_DBpedia_Entities"
+java -jar ds_a1-0.0.1-SNAPSHOT-jar-with-dependencies.jar -classify /home/ns1077/benchmarkY1/benchmarkY1-train/train.pages.cbor-outlines.cbor /home/ns1077/ParagraphIndexPr2/ /home/ns1077/Runfile/ 
 
 When the program is running, you can see messages from console. The messages indicate the process. 
 
 When the program is done, you can see a message like "All works DONE. Generate [number of runfiles] runfiles in [output folder you specified]" from console.
 
-# Outputs
+# Test Results
 
-For your convience, we stored all the outputs for test data for you to evaluate. They are stored here
-
-TREC-Complex-answer-retrieval-Track/Output/Runfiles_testData
+The three test runs from our team are in the Path below in the server.
+/home/ns1077/benchmarkY1TestRuns
 
 # Methods Description
 
@@ -112,6 +111,34 @@ At each node of the tree, J48 chooses the attribute of the data that most effect
 # 8.Random Forest Classifier
 
 Random Forest are an ensemble learning method for classification, regression and other tasks, that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classification) or mean prediction (regression) of the individual trees. Random decision forests correct for decision trees' habit of overfitting to their training set.
+
+# 9.Learn to Rank
+
+1. Use makeRanklibFile.py to generate feature files for training data and test data. 
+2. Use Ranklib to train the feature file for training data and generate the model file.
+3. Use the model file to rank the feature file of test data and get the score file.
+4. Use reRankByML.py to generate the run file by using the score file.
+(You can find those python scripts in ./pyScript)
+
+# 10.Re-rank by TagMe Type
+
+1)A search method was implemented, “BM25” similarity of “lucene” was used to compute similarity between query and paragraph to generate a baseline run file. 
+2) The paragraph IDs of the baseline run file were compared with the “dedup.articles-paragraphs.cbor” to get the text content. 
+3) For each paragraph ID, entities and its respective type was gathered using TagMe. 
+4) The frequency of TagMe type was clustered for each paragraph ID in the run file. 
+5) The run file was then re-ranked as per the descending order of the frequency of type in a paragraph given a query.
+
+# 11.Re-Rank by TagMe Type and BM25 similarity with weight
+
+1)A search method was implemented, ” BM25” similarity of “lucene” was used to compute similarity between query and paragraph to generate a baseline run file. 
+2) The paragraph IDs of the baseline run file were compared with the “dedup.articles-paragraphs.cbor” to get the text content. 
+3) For each paragraph ID, entities and its respective type was gathered using TagMe.
+4) The frequency of TagMe type was clustered for each paragraph ID in the run file. 
+5) The run file was then re-ranked as per the descending order of the frequency of type in a paragraph given a query. 
+6) The run file generated was further processed to get a better score were both the rank and BM25 score could be used to get an appropriate ranking. New score = BM25 similarity score + 1/(Rank of the para id as per frequency of type) 
+7) The New score was then used to re-rank the run file.
+This method was implemented for top 100 paragraph IDs for below three run file (section, Lowest_heading_Section, CK_Section )
+
 
 
 

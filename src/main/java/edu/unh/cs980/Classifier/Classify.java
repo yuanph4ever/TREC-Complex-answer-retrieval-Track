@@ -68,8 +68,8 @@ public class Classify {
 
 		System.out.println("Model loaded successfully");
 
-		classiyPageSearch(outputPath, indexPath, pagesFile, cls_J48, "J-48");
-		classifySectionSearch(outputPath, indexPath, pagesFile, cls_J48, "J-48");
+		//classiyPageSearch(outputPath, indexPath, pagesFile, cls_J48, "J-48");
+		//classifySectionSearch(outputPath, indexPath, pagesFile, cls_J48, "J-48");
 
 		System.out
 				.println("classification results written to the file " + outputPath + "/" + "J-48" + "runfile_pagePr3");
