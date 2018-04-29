@@ -119,49 +119,54 @@ public class Main {
 
 		else if (method_signal.equals("-classify")) {
 
+			
+			ClassifierModel cm = new ClassifierModel("/home/ns1077/Prototype3/TrainingData", "/home/ns1077/Model");
+			cm.buildJ48Classifier("/home/ns1077/Prototype3/TrainingData", "/home/ns1077/Model");
+			cm.buildRandomForestClassifier("/home/ns1077/Prototype3/TrainingData", "/home/ns1077/Model");
+			cm.buildNaiveBayesClassifier("/home/ns1077/Prototype3/TrainingData", "/home/ns1077/Model");
 			// Nithin - methods
 
-			// Train
-			String paraPageTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
-			String paraSectionTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
-			// Test
-			String paraPageTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
-			String paraSectionTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
-			/**********************************************************************************************************/
-
-			System.out.println("======================= BaseLine Candidate set=====================================");
-			BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
-
-			/**********************************************************************************************************/
-
-			System.out.println("======================= Classifying BM25 Set =====================================");
-			Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
-
-			
-
-			/******************************************** Classify K-means ********************************************/
-			
-			System.out.println("Classifiying Kmeans Resuslt");
-			String kmeansRunFile = outputPath + "/train_runfile_section_cluster_kmeans_20k";
-			File isFileExist = new File(kmeansRunFile);
-			if(!isFileExist.exists())
-			{
-				System.out.println("Kmeans output doesnot exist - moving to classifying candidate set");
-			}
-			else
-			{
-				ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,"kmeanssection");
-			}
-			
-			/**********************************************************************************************************/
-
-			System.out.println("======================= Classifying Laura Candidate Set ===========================");
-			ReadRunFileAndClassify rrfc = new ReadRunFileAndClassify(paraPageTrain, indexPath, outputPath, "para");
-			ReadRunFileAndClassify rrfcSec = new ReadRunFileAndClassify(paraSectionTrain, indexPath, outputPath,
-					"section");
-			System.out.println(" =================All works done ==================================================");
-
-			/**********************************************************************************************************/
+//			// Train
+//			String paraPageTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
+//			String paraSectionTrain = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1train.v201.cbor.outlines.run";
+//			// Test
+//			String paraPageTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-page--title-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
+//			String paraSectionTest = "/home/dietz/candidate-runs-all/benchmarkY1train-lucene-runs/lucene1--paragraph-section--sectionPath-ql-none--Text-std-k1000-benchmarkY1test.v201.cbor.outlines.run";
+//			/**********************************************************************************************************/
+//
+//			System.out.println("======================= BaseLine Candidate set=====================================");
+//			BM25 bm25 = new BM25(pagesFile, indexPath, outputPath);
+//
+//			/**********************************************************************************************************/
+//
+//			System.out.println("======================= Classifying BM25 Set =====================================");
+//			Classify classifyPage = new Classify(outputPath, pagesFile, indexPath);
+//
+//			
+//
+//			/******************************************** Classify K-means ********************************************/
+//			
+//			System.out.println("Classifiying Kmeans Resuslt");
+//			String kmeansRunFile = outputPath + "/train_runfile_section_cluster_kmeans_20k";
+//			File isFileExist = new File(kmeansRunFile);
+//			if(!isFileExist.exists())
+//			{
+//				System.out.println("Kmeans output doesnot exist - moving to classifying candidate set");
+//			}
+//			else
+//			{
+//				ReadRunFileAndClassify rrfcSecKMeans = new ReadRunFileAndClassify(kmeansRunFile, indexPath, outputPath,"kmeanssection");
+//			}
+//			
+//			/**********************************************************************************************************/
+//
+//			System.out.println("======================= Classifying Laura Candidate Set ===========================");
+//			ReadRunFileAndClassify rrfc = new ReadRunFileAndClassify(paraPageTrain, indexPath, outputPath, "para");
+//			ReadRunFileAndClassify rrfcSec = new ReadRunFileAndClassify(paraSectionTrain, indexPath, outputPath,
+//					"section");
+//			System.out.println(" =================All works done ==================================================");
+//
+//			/**********************************************************************************************************/
 		}
 
 		// Print usage
